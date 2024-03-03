@@ -1,11 +1,20 @@
-export default function MyMessagePart() {
+import { messageDateFormat } from "../utils/messageDateFormat";
+
+// messageDateFormat
+export default function MyMessagePart({
+  data,
+  date,
+}: {
+  data: string;
+  date: Date;
+}) {
   return (
     <div className="user_conversation_container">
-      <div className="user_msg_container">
-        <div className="other_user_messages">
-          <p>Looks cool 👍</p>
+      <div className="my_msg_container">
+        <div className="my_messages">
+          <p>{data}</p>
         </div>
-        <span>4:37 PM · Jan 16, 2024</span>
+        <span>{messageDateFormat(date)}</span>
       </div>
     </div>
   );

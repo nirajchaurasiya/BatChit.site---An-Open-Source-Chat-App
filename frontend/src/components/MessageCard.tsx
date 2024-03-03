@@ -38,7 +38,7 @@ export default function MessageCard({ data }: MessageCardType) {
           ) : (
             <p
               className="text-bg"
-              style={{ backgroundColor: data?.background }}
+              style={{ backgroundColor: data?.adminUserDetails?.background }}
             >
               {data?.chatName?.slice(0, 1)}
             </p>
@@ -50,10 +50,15 @@ export default function MessageCard({ data }: MessageCardType) {
                 : data.adminUserDetails.fullName}
             </p>
             <p>
-              {data.isGroupChat
-                ? data?.chatName + " : " + data.latestMessage
-                : data.adminUserDetails.fullName?.split(" ")[0] +
-                  ` created this chat!`}
+              {data?.latestMessageDetails?._id
+                ? `${
+                    data?.latestMessageDetails?.senderDetails?.fullName?.split(
+                      " "
+                    )[0]
+                  }:  ${data?.latestMessageDetails?.content?.slice(0, 20)}`
+                : `${
+                    data?.adminUserDetails?.fullName?.split(" ")[0]
+                  } created this chat`}
             </p>
           </div>
         </div>

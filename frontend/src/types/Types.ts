@@ -1,20 +1,47 @@
+
 interface UserDetails {
   _id: string;
   email: string;
   fullName: string;
+  background: string
+  bio: string
 }
 
 export type Chat = [{
   _id: string;
   chatName: string;
   isGroupChat: boolean;
-  latestMessage: string;
+  latestMessageDetails: MessageDetails
   createdAt: Date;
   updatedAt: Date;
   __v: number;
   adminUserDetails: UserDetails;
   userDetails: UserDetails[];
 }]
+export type SingleChat = {
+  _id: string;
+  chatName: string;
+  isGroupChat: boolean;
+  latestMessageDetails: MessageDetails
+  createdAt: Date;
+  updatedAt: Date;
+  __v: number;
+  adminUserDetails: UserDetails;
+  userDetails: UserDetails[];
+}
+
+export type Messages = [{
+  _id: string;
+  sender: string;
+  content: string;
+  readBy: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  __v: number;
+  senderDetails: UserDetails;
+  readByDetails: UserDetails[];
+}]
+
 
 export type LayoutParamsType = {
   home?: boolean;
@@ -30,19 +57,40 @@ export type LayoutParamsType = {
   deleteAccount?: boolean;
   widthOfWindow?: number;
 };
+interface MessageDetails {
+  _id: string;
+  sender: string;
+  content: string;
+  chat: string;
+  readBy: {
+    _id: string;
+    email: string;
+    fullName: string;
+    background: string;
+  }[];
+  createdAt: Date;
+  updatedAt: Date;
+  __v: number;
+  senderDetails: {
+    _id: string;
+    email: string;
+    fullName: string;
+    background: string;
+  };
+}
 
 export type MessageCardType = {
   data: {
     _id: string;
     chatName: string;
     isGroupChat: boolean;
-    latestMessage: string;
+    latestMessageDetails: MessageDetails
     createdAt: Date;
     updatedAt: Date;
     __v: number;
     adminUserDetails: UserDetails;
     userDetails: UserDetails[];
-    background: string
+
   }
 };
 export type HomeParams = LayoutParamsType & {

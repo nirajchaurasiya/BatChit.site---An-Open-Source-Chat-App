@@ -8,6 +8,8 @@ import { saveLoggedInUser } from "../features/auth/authSlice";
 import { AlertMessageType } from "../types/AlertTypes";
 import { displayAlert } from "../utils/alertUtils";
 import { AlertMessages } from "../AlertMsg/alertMsg";
+import { MdVerified } from "react-icons/md";
+import { GoUnverified } from "react-icons/go";
 export default function UserInformation({
   widthOfWindow,
 }: {
@@ -88,7 +90,25 @@ export default function UserInformation({
               }}
             >
               <img src="/user1.jpg" alt="" />
-              <p style={{ fontWeight: "600", fontSize: "20px" }}>{fullName}</p>
+              <p style={{ fontWeight: "600", fontSize: "20px" }}>
+                {user.fullName}
+              </p>
+              <p
+                style={{
+                  fontWeight: "500",
+                  fontSize: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "5px",
+                }}
+              >
+                {user.email}
+                {user.isActivated ? (
+                  <MdVerified title="verified" />
+                ) : (
+                  <GoUnverified title="unverified" />
+                )}
+              </p>
             </div>
           </div>
           <form onSubmit={handleSaveChanges} className="user-name-and-bio">

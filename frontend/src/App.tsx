@@ -171,7 +171,7 @@ export default function App() {
             }
           />
           <Route
-            path="/messages/:userId"
+            path="/messages/:chatId"
             element={
               <section className="layout">
                 <Layout message={true} />

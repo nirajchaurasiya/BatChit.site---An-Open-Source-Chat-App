@@ -1,4 +1,4 @@
-import { Chat } from "./Types";
+import { Chat, Messages } from "./Types";
 
 export interface RootState {
     auth: {
@@ -6,6 +6,9 @@ export interface RootState {
     };
     chats: {
         allChatCards: Chat
+    }
+    messages: {
+        allMessages: Messages
     }
 }
 

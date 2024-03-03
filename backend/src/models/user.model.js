@@ -36,10 +36,7 @@ const userSchema = new Schema(
     bio: {
       type: String,
     },
-    password: {
-      type: String,
-      required: [true, "Password is required"],
-    },
+
     refreshToken: {
       type: String,
     },
@@ -55,6 +52,10 @@ const userSchema = new Schema(
     isActivated: {
       type: Boolean,
       default: false,
+    },
+    password: {
+      type: String,
+      required: [true, "Password is required"],
     },
     activationToken: {
       type: String,
