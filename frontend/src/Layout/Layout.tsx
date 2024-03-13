@@ -29,6 +29,7 @@ export default function Layout({
   blockedAccounts,
   userInformation,
   deleteAccount,
+  socket,
 }: LayoutParamsType) {
   const [widthOfWindow, setWidthOfWindow] = useState(0);
   const location = useLocation();
@@ -107,9 +108,10 @@ export default function Layout({
         blockedAccounts={blockedAccounts}
         widthOfWindow={widthOfWindow}
         chatsCard={chatsData}
+        socket={socket}
       >
         {home && <SelectaMessage widthOfWindow={widthOfWindow} />}
-        {message && <SingleMessage />}
+        {message && <SingleMessage socket={socket} />}
         {search && searchQuery && (
           <ViewSearchedPerson widthOfWindow={widthOfWindow} />
         )}

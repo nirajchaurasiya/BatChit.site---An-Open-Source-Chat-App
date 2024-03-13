@@ -57,7 +57,7 @@ export default function Profile({ isGroup }: { isGroup?: boolean }) {
             />
           </div>
           <div className="profile_name_contacts">
-            <p>{(profile as GroupedUserType).name}</p>
+            <p>{(profile as GroupedUserType).fullName}</p>
           </div>
         </div>
         <div className="profile_about">

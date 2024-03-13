@@ -4,12 +4,15 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Layout from "./Layout/Layout";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "./types/Rootstate";
-import { login } from "./features/auth/authSlice";
+import { saveLoggedInUser } from "./features/auth/authSlice";
 import { getCookie } from "./utils/getCookies";
 import AuthLayout from "./components/AuthLayout";
 import Spinner from "./components/Spinner";
 import PageNotFound from "./components/PageNotFound";
 import { Dispatch } from "@reduxjs/toolkit";
+import { login } from "./apis/login";
+import { saveMessages } from "./features/messages/messageSlice";
+import { saveChatCards } from "./features/chat/chatSlice";
 export default function App() {
   const [socket, setSocket] = useState<Socket | null>(null);
   const REACT_APP_BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
@@ -28,13 +31,32 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    socket?.emit("add-user");
+    if (loggedInUser?._id) {
+      socket?.emit("add-user", loggedInUser._id);
+    }
+  }, [socket, loggedInUser?._id]);
+
+  useEffect(() => {
+    const updateIndividualMessage = (data: any) => {
+      const { messages, receiverChats, senderChats } = data;
+      dispatch(saveMessages(messages));
+      if (senderChats) {
+        dispatch(saveChatCards(senderChats));
+      } else dispatch(saveChatCards(receiverChats));
+    };
+    socket?.on("update-individual-message", updateIndividualMessage);
+
+    return () => {
+      socket?.off("update-individual-message", updateIndividualMessage);
+    };
   }, [socket]);
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (accessToken && typeof accessToken === "string") {
-        dispatch(login(accessToken));
+      const loginUser = await login();
+      const { user, success } = loginUser;
+      if (success) {
+        dispatch(saveLoggedInUser(user));
       }
       setTimeout(() => {
         setLoader(false);
@@ -42,11 +64,6 @@ export default function App() {
     };
     fetchUser();
   }, []);
-  // const emitChatMsg = () => {
-  //   if (socket) {
-  //     socket.emit("chat-message", { userId: "123", username: "example" });
-  //   }
-  // };
   if (accessToken) {
     if (loader) return <Spinner />;
   }
@@ -85,7 +102,7 @@ export default function App() {
             path="/"
             element={
               <section className="layout">
-                <Layout home={true} />
+                <Layout socket={socket} home={true} />
               </section>
             }
           />
@@ -94,7 +111,7 @@ export default function App() {
             path="/search"
             element={
               <section className="layout">
-                <Layout search={true} />
+                <Layout socket={socket} search={true} />
               </section>
             }
           />
@@ -103,7 +120,7 @@ export default function App() {
             path="/group-messages"
             element={
               <section className="layout">
-                <Layout groupMessages={true} />
+                <Layout socket={socket} groupMessages={true} />
               </section>
             }
           />
@@ -112,7 +129,7 @@ export default function App() {
             path="/group-messages/:groupId"
             element={
               <section className="layout">
-                <Layout groupMessages={true} isGroup />
+                <Layout socket={socket} groupMessages={true} isGroup />
               </section>
             }
           />
@@ -120,7 +137,7 @@ export default function App() {
             path="/user-history"
             element={
               <section className="layout">
-                <Layout history={true} />
+                <Layout socket={socket} history={true} />
               </section>
             }
           />
@@ -128,7 +145,7 @@ export default function App() {
             path="/profile"
             element={
               <section className="layout">
-                <Layout profile={true} />
+                <Layout socket={socket} profile={true} />
               </section>
             }
           />
@@ -138,7 +155,7 @@ export default function App() {
             path="/profile/user-information"
             element={
               <section className="layout">
-                <Layout profile={true} userInformation />
+                <Layout socket={socket} profile={true} userInformation />
               </section>
             }
           />
@@ -147,7 +164,7 @@ export default function App() {
             path="/profile/blocked-accounts"
             element={
               <section className="layout">
-                <Layout profile={true} blockedAccounts />
+                <Layout socket={socket} profile={true} blockedAccounts />
               </section>
             }
           />
@@ -156,7 +173,7 @@ export default function App() {
             path="/profile/delete-account"
             element={
               <section className="layout">
-                <Layout profile={true} deleteAccount />
+                <Layout socket={socket} profile={true} deleteAccount />
               </section>
             }
           />
@@ -166,7 +183,7 @@ export default function App() {
             path="/logout"
             element={
               <section className="layout">
-                <Layout logout={true} />
+                <Layout socket={socket} logout={true} />
               </section>
             }
           />
@@ -174,7 +191,7 @@ export default function App() {
             path="/messages/:chatId"
             element={
               <section className="layout">
-                <Layout message={true} />
+                <Layout socket={socket} message={true} />
               </section>
             }
           />

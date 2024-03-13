@@ -38,7 +38,6 @@ export default function Login() {
         })
         .catch((err) => {
           const { status }: { status: number } = err.response;
-          console.log(status);
           const alertMsgCode = getAlert(status, "login");
           displayAlert(
             setShowAlert,

@@ -16,7 +16,6 @@ export default function MessageCard({ data }: MessageCardType) {
   const loggedInUser = useSelector(
     (state: RootState) => state.auth.loggedInUser
   );
-
   return (
     <NavLink
       to={
@@ -45,17 +44,30 @@ export default function MessageCard({ data }: MessageCardType) {
           )}
           <div className="user-name-msg">
             <p>
-              {loggedInUser._id === data.adminUserDetails._id
-                ? data.chatName
-                : data.adminUserDetails.fullName}
+              {data.adminUserDetails?._id === loggedInUser?._id
+                ? data?.receiverUserDetails?.fullName
+                : data?.adminUserDetails?.fullName}
             </p>
             <p>
               {data?.latestMessageDetails?._id
                 ? `${
-                    data?.latestMessageDetails?.senderDetails?.fullName?.split(
-                      " "
-                    )[0]
-                  }:  ${data?.latestMessageDetails?.content?.slice(0, 20)}`
+                    data?.latestMessageDetails?.senderDetails?._id ===
+                    loggedInUser?._id
+                      ? "You"
+                      : data?.latestMessageDetails?.senderDetails?.fullName?.split(
+                          " "
+                        )[0]
+                  }:  ${
+                    data?.latestMessageDetails?.content
+                      ? data?.latestMessageDetails?.content?.slice(0, 20)
+                      : data?.latestMessageDetails?.media
+                      ? data?.latestMessageDetails?.mediaType
+                          ?.split("/")
+                          ?.includes("image")
+                        ? " sent a photo"
+                        : " sent a video"
+                      : " created this chat"
+                  }`
                 : `${
                     data?.adminUserDetails?.fullName?.split(" ")[0]
                   } created this chat`}

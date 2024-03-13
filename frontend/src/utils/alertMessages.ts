@@ -36,10 +36,12 @@ export const allAlertMessages = [
   {
     type: "email",
     availableStatusAlerts: [
-      { code: 5000, msg: "Can't send the email", statusCode: 409 },
+      { code: 5000, msg: "Please try again", statusCode: 409 },
       { code: 5001, msg: "Something went wrong", statusCode: 500 },
-      { code: 5002, msg: "Email sent!", statusCode: 200 },
+      { code: 5002, msg: "Email sent", statusCode: 200 },
+      { code: 5002, msg: "User doesn't exists", statusCode: 402 },
       { code: 5003, msg: "Invalid email format", statusCode: 400 },
+      { code: 5004, msg: "Unauthorized request", statusCode: 401 },
     ],
   },
   {
@@ -55,7 +57,7 @@ export const allAlertMessages = [
     type: "chatCards",
     availableStatusAlerts: [
       {
-        code: 7000, msg: "Chats retrieved success", statusCode: 200
+        code: 7000, msg: "Chats retrieved success", statusCode: 201
       },
       {
         code: 7001, msg: "User doesn't exists", statusCode: 404
@@ -64,7 +66,7 @@ export const allAlertMessages = [
         code: 7002, msg: "An errror occured", statusCode: 500
       },
       {
-        code: 7003, msg: 'Chat created successfully', statusCode: 201
+        code: 7003, msg: 'Chat created successfully', statusCode: 200
       },
       {
         code: 7004, msg: 'Unauthorized request', statusCode: 400

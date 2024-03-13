@@ -9,7 +9,11 @@ const Authorization = {
     },
 }
 export const getAllChatCards = async () => {
-    const response = await axios.get(`${chatsBackendURL}/get-chats`, Authorization)
+    const response = await axios.get(`${chatsBackendURL}/individual/get-chats`, {
+        headers: {
+            Authorization: `Bearer ${access_Token}`, // Set Authorization header with access token
+        },
+    })
     const { statusCode, data, success, code } = response.data
 
     if (statusCode === 200 && success) {
@@ -25,9 +29,9 @@ export const addChat = async (fullName: string, _id: string) => {
     const details = {
         chatName: fullName,
         isGroupChat: false,
-        users: [`${_id}`]
+        receiver: _id
     }
-    const res = await axios.post(`${chatsBackendURL}/create-chat`, details, Authorization)
+    const res = await axios.post(`${chatsBackendURL}/individual/create-chat`, details, Authorization)
 
     const { success, statusCode, data, code } = res.data
 
@@ -38,7 +42,7 @@ export const addChat = async (fullName: string, _id: string) => {
 
 
 export const getAllMessagesWithId = async (chatId: string) => {
-    const allMessages = await axios.get(`${chatsBackendURL}/get-all-messages/${chatId}`)
+    const allMessages = await axios.get(`${chatsBackendURL}/individual/get-messages/${chatId}`, Authorization)
     const { statusCode, success, code, data } = allMessages.data
     if (success && statusCode === 200) {
         return { success, code, data }

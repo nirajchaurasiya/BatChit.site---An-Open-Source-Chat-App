@@ -1,13 +1,16 @@
 import mongoose from "mongoose";
 
-const chatSchema = new mongoose.Schema(
+const groupChatSchema = new mongoose.Schema(
   {
     chatName: { type: String, trim: true },
-    isGroupChat: { type: Boolean, default: false },
+    isGroupChat: {
+      type: Boolean,
+      default: true,
+    },
     users: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     latestMessage: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Message",
+      ref: "Groupchatmessage",
       // default:mongoose.Types.ObjectId()
     },
     admin: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -15,4 +18,4 @@ const chatSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export const Chat = mongoose.model("Chat", chatSchema);
+export const GroupChat = mongoose.model("Groupchat", groupChatSchema);

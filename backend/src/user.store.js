@@ -1,16 +1,15 @@
 let user = [];
 
-const addUser = (userId) => {
-  const isUserExist = user.find((id) => id.userId === userId);
-  if (!isUserExist) {
-    user.push({ userId: userId });
-  } else {
-    console.log(`User with ID already exists`);
-  }
+const addUser = (socketId, userId) => {
+   const isUserExist = user.find((id) => id.userId === userId);
+   if (!isUserExist) {
+      user.push({ socketId, userId });
+   } else {
+      console.log(`User with ID already exists`);
+   }
 };
 
-const removeUser = (userId) => {
-  const isUserExist = user.filter((id) => id.userId !== userId);
-  user = isUserExist;
+const removeUser = (socketId) => {
+   user = user.filter((id) => id.socketId !== socketId);
 };
 export { user, addUser, removeUser };

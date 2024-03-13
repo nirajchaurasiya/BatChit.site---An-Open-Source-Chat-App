@@ -9,7 +9,7 @@ export const updateAccount = async (fullName: string, bio?: string) => {
             return { success, data }
         }
         return { success: false }
-    } catch (error) {
+    } catch (error: any) {
         return { success: false, msg: error?.message || error };
     }
-}
+}   

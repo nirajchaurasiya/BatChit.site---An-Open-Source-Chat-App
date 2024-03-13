@@ -16,17 +16,20 @@ export function messageDateFormat(newDate: Date) {
 
     return `${formattedHour}:${formattedMinute} ${ampm} · ${month} ${day}, ${year}`;
 }
-export function formatDateForInitialChatCreationAlert(inputDateString: Date) {
-    const date = new Date(inputDateString);
+export function formatDateForInitialChatCreationAlert(inputDateString?: Date) {
+    if (inputDateString) {
+        const date = new Date(inputDateString);
 
-    const months = [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    ];
+        const months = [
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ];
 
-    const month = months[date.getMonth()];
-    const day = date.getDate();
-    const year = date.getFullYear();
+        const month = months[date.getMonth()];
+        const day = date.getDate();
+        const year = date.getFullYear();
 
-    return `${month} ${day}, ${year}`;
+        return `${month} ${day}, ${year}`;
+    }
+    return null
 }

@@ -13,6 +13,10 @@ import UserProfile from "./UserProfile";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../types/Rootstate";
+import { sendEmail } from "../utils/sendEmail";
+import { AlertMessageType } from "../types/AlertTypes";
+import { AlertMessages } from "../AlertMsg/alertMsg";
+import { displayAlert } from "../utils/alertUtils";
 
 export default function Home({
   children,
@@ -30,7 +34,9 @@ export default function Home({
   const [alertButtonText, setAlertButtonText] = useState(
     "Send activation link"
   );
-
+  const [showAlert, setShowAlert] = useState(false);
+  const [code, setCode] = useState(3001);
+  const [msgType, setMsgType] = useState<AlertMessageType>("email");
   const [addGroupChat, setAddGroupChat] = useState(false);
   const showProfileOptions = useContext(ToggleProfile);
 
@@ -49,21 +55,33 @@ export default function Home({
   const navigate = useNavigate();
 
   const handleSendEmail = async () => {
-    // setAlertButtonText("Sending...");
-    setTimeout(() => {
-      setAlertButtonText("Please check your email");
-    }, 3000);
+    setAlertButtonText("Sending...");
 
-    // const response = await sendEmail("ACCOUNT_ACTIVATION");
+    const response = await sendEmail("ACCOUNT_ACTIVATION");
+
+    const { success, code } = response;
+    if (success) {
+      displayAlert(setShowAlert, setCode, setMsgType, code, "email", 5000);
+      setAlertButtonText("Sent✅");
+      setTimeout(() => {
+        setAlertButtonText("Send activation link");
+      }, 5000);
+    } else {
+      displayAlert(setShowAlert, setCode, setMsgType, 5001, "email", 5000);
+      setAlertButtonText("Send activation link");
+    }
   };
   const { userId } = useParams();
 
   const { showProfile, setShowProfile } = showProfileOptions;
 
+  const { chatId } = useParams();
+
+  const chats = useSelector((state: RootState) => state.chats.allChatCards);
+
   const handleAddGroupChat = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   };
-
   return (
     <section className="home-container">
       <div className="home-mid-container">
@@ -125,7 +143,7 @@ export default function Home({
                 chatsCard.filter((chat) => !chat.isGroupChat).length > 0 ? (
                   chatsCard
                     .filter((chat) => !chat.isGroupChat)
-                    .map((card) => <MessageCard key={card._id} data={card} />)
+                    ?.map((card) => <MessageCard key={card._id} data={card} />)
                 ) : (
                   <div
                     style={{
@@ -414,8 +432,8 @@ export default function Home({
                       <p style={{ marginTop: "-7px", color: "gray" }}>
                         Using this platform, you can send even large files upto
                         2 GB.
-                        <p style={{ color: "green" }}>Isn't it great?</p>
                       </p>
+                      <p style={{ color: "green" }}>Isn't it great?</p>
                     </div>
                   </div>
                 </>
@@ -500,15 +518,33 @@ export default function Home({
                 <img src="/user1.jpg" alt="" />
               </div>
               <div className="profile_name_contacts">
-                <p>Niraj Chaurasiya</p>
-                <span>nirajchaurasiya@gmail.com</span>
+                <p>
+                  {chats?.find((field) => field._id === chatId)
+                    ?.adminUserDetails?._id === loggedInUser?._id
+                    ? chats?.find((field) => field._id === chatId)
+                        ?.receiverUserDetails?.fullName
+                    : chats?.find((field) => field._id === chatId)
+                        ?.adminUserDetails?.fullName}
+                </p>
+                <span>
+                  {chats?.find((field) => field._id === chatId)
+                    ?.adminUserDetails?._id === loggedInUser?._id
+                    ? chats?.find((field) => field._id === chatId)
+                        ?.receiverUserDetails?.email
+                    : chats?.find((field) => field._id === chatId)
+                        ?.adminUserDetails?.email}
+                </span>
               </div>
             </div>
             <div className="profile_about">
               <p>About</p>
               <p>
-                Fullstack developer committed to be the world's best Robotics
-                Engineer • Tweets around web development | AI | ML
+                {chats?.find((field) => field._id === chatId)?.adminUserDetails
+                  ?._id === loggedInUser?._id
+                  ? chats?.find((field) => field._id === chatId)
+                      ?.receiverUserDetails?.bio || "Hey, I am using @app!"
+                  : chats?.find((field) => field._id === chatId)
+                      ?.adminUserDetails?.bio || "Hey, I am using @app!"}
               </p>
             </div>
             <div className="msg_credentials">
@@ -526,13 +562,29 @@ export default function Home({
                 <p>
                   <MdBlock />
                 </p>
-                <span>Block Niraj Chaurasiya</span>
+                <span>
+                  Block{" "}
+                  {chats?.find((field) => field._id === chatId)
+                    ?.adminUserDetails?._id === loggedInUser?._id
+                    ? chats?.find((field) => field._id === chatId)
+                        ?.receiverUserDetails?.fullName
+                    : chats?.find((field) => field._id === chatId)
+                        ?.adminUserDetails?.fullName}
+                </span>
               </div>
               <div className="delete_chat">
                 <p>
                   <BiSolidDislike />
                 </p>
-                <span>Report Niraj Chaurasiya</span>
+                <span>
+                  Report{" "}
+                  {chats?.find((field) => field._id === chatId)
+                    ?.adminUserDetails?._id === loggedInUser?._id
+                    ? chats?.find((field) => field._id === chatId)
+                        ?.receiverUserDetails?.fullName
+                    : chats?.find((field) => field._id === chatId)
+                        ?.adminUserDetails?.fullName}
+                </span>
               </div>
 
               <div className="delete_chat">
@@ -593,6 +645,9 @@ export default function Home({
             </form>
           </div>
         </div>
+      )}
+      {showAlert && (
+        <AlertMessages setShowAlert={setShowAlert} code={code} type={msgType} />
       )}
     </section>
   );

@@ -1,4 +1,4 @@
-export type AlertMessageType = "login" | "registration" | "updateAccount" | "chatCards";
+export type AlertMessageType = "login" | "registration" | "updateAccount" | "chatCards" | 'email';
 export type ShowAlertType = {
   code: number;
   msg: string;

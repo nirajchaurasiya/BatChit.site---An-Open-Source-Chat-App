@@ -1,47 +1,55 @@
+import { Socket } from "socket.io-client";
 
 interface UserDetails {
   _id: string;
-  email: string;
   fullName: string;
-  background: string
-  bio: string
+  bio?: string; // Optional property
+  background: string;
+  email: string
 }
 
-export type Chat = [{
-  _id: string;
-  chatName: string;
-  isGroupChat: boolean;
-  latestMessageDetails: MessageDetails
-  createdAt: Date;
-  updatedAt: Date;
-  __v: number;
-  adminUserDetails: UserDetails;
-  userDetails: UserDetails[];
-}]
-export type SingleChat = {
-  _id: string;
-  chatName: string;
-  isGroupChat: boolean;
-  latestMessageDetails: MessageDetails
-  createdAt: Date;
-  updatedAt: Date;
-  __v: number;
-  adminUserDetails: UserDetails;
-  userDetails: UserDetails[];
-}
 
-export type Messages = [{
+interface LatestMessageDetails {
   _id: string;
   sender: string;
   content: string;
-  readBy: string[];
+  senderDetails: UserDetails;
+  media: string;
+  mediaType: string
+}
+
+export type IndividualChatDetails = [{
+  _id: string;
+  chatName: string;
+  isGroupChat: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  __v: number;
+  adminUserDetails: UserDetails;
+  receiverUserDetails: UserDetails;
+  latestMessageDetails: LatestMessageDetails;
+  isSeen: Boolean
+}]
+
+
+interface ChatDetails {
+  _id: string;
+  chatName: string;
+}
+
+export interface Messages {
+  _id: string;
+  content: string;
+  media?: string
+  mediaType?: string
+  readBy: string;
   createdAt: Date;
   updatedAt: Date;
   __v: number;
   senderDetails: UserDetails;
-  readByDetails: UserDetails[];
-}]
-
+  chatDetails: ChatDetails;
+  isSeen: Boolean
+}
 
 export type LayoutParamsType = {
   home?: boolean;
@@ -56,46 +64,27 @@ export type LayoutParamsType = {
   blockedAccounts?: boolean;
   deleteAccount?: boolean;
   widthOfWindow?: number;
+  socket: Socket | null
 };
-interface MessageDetails {
-  _id: string;
-  sender: string;
-  content: string;
-  chat: string;
-  readBy: {
-    _id: string;
-    email: string;
-    fullName: string;
-    background: string;
-  }[];
-  createdAt: Date;
-  updatedAt: Date;
-  __v: number;
-  senderDetails: {
-    _id: string;
-    email: string;
-    fullName: string;
-    background: string;
-  };
-}
 
 export type MessageCardType = {
   data: {
     _id: string;
     chatName: string;
     isGroupChat: boolean;
-    latestMessageDetails: MessageDetails
     createdAt: Date;
     updatedAt: Date;
     __v: number;
-    adminUserDetails: UserDetails;
-    userDetails: UserDetails[];
 
+    adminUserDetails: UserDetails;
+    receiverUserDetails: UserDetails;
+    latestMessageDetails: LatestMessageDetails;
   }
 };
+
 export type HomeParams = LayoutParamsType & {
   children: React.ReactNode;
-  chatsCard: Chat | []
+  chatsCard: IndividualChatDetails | []
 };
 export type ViewSearchedPersonType = {
   _id: string;

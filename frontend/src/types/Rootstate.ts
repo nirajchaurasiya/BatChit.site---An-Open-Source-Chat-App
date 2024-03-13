@@ -1,14 +1,14 @@
-import { Chat, Messages } from "./Types";
+import { IndividualChatDetails, Messages } from "./Types";
 
 export interface RootState {
     auth: {
         loggedInUser: UserType
     };
     chats: {
-        allChatCards: Chat
+        allChatCards: IndividualChatDetails
     }
     messages: {
-        allMessages: Messages
+        allMessages: Messages[]
     }
 }
 
