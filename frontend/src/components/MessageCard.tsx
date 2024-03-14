@@ -59,7 +59,10 @@ export default function MessageCard({ data }: MessageCardType) {
                         )[0]
                   }:  ${
                     data?.latestMessageDetails?.content
-                      ? data?.latestMessageDetails?.content?.slice(0, 20)
+                      ? data?.latestMessageDetails?.content?.length > 25
+                        ? data?.latestMessageDetails?.content?.slice(0, 30) +
+                          "..."
+                        : data?.latestMessageDetails?.content?.slice(0, 25)
                       : data?.latestMessageDetails?.media
                       ? data?.latestMessageDetails?.mediaType
                           ?.split("/")

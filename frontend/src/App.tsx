@@ -13,6 +13,7 @@ import { Dispatch } from "@reduxjs/toolkit";
 import { login } from "./apis/login";
 import { saveMessages } from "./features/messages/messageSlice";
 import { saveChatCards } from "./features/chat/chatSlice";
+import Navbar from "./components/Navbar";
 export default function App() {
   const [socket, setSocket] = useState<Socket | null>(null);
   const REACT_APP_BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
@@ -70,6 +71,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <main>
+        <Navbar />
         <Routes>
           {/*  Before Authentication */}
           <Route

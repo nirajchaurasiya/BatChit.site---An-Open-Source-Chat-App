@@ -1,12 +1,14 @@
 .user-info-container {
   height: 100vh;
   overflow-y: scroll;
+  padding-bottom: 200px;
 }
 .user-info-container::-webkit-scrollbar {
   width: 0;
 }
 .user-info-header {
   padding: 8px 20px;
+  background-color: rgb(23, 23, 23);
 }
 .user-profile-mid-container {
   display: grid;
@@ -69,14 +71,13 @@
   justify-content: center;
 }
 .action-button {
-  width: 20%;
   margin-top: 10px;
+  width: 100%;
 }
 .action-button button {
   cursor: pointer;
   width: 100%;
   padding: 10px;
-  width: 100%;
   padding: 10px;
   background-color: transparent;
   border: 1px solid rgb(80, 79, 79);

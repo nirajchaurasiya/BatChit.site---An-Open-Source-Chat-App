@@ -9,7 +9,7 @@ import {
   BiSolidUserCircle,
   BiUserCircle,
 } from "react-icons/bi";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { getLocation } from "../utils/getLocation";
 import { IoLogOut } from "react-icons/io5";
 import { MdOutlineLogout } from "react-icons/md";
@@ -49,11 +49,6 @@ export default function Linkscontainer() {
   };
   return (
     <div className="links">
-      <Link to="/">
-        <div className="logo">
-          <img src="/logo2.png" alt="logo" />
-        </div>
-      </Link>
       <div className="tab-icons">
         <div
           className={`icon ${

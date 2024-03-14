@@ -13,21 +13,23 @@
 .top-header {
   top: 0;
   position: sticky;
-  border-bottom: 1px solid #252525;
+  border-top: 1px solid #252525;
   background: rgba(33, 33, 33, 0.2);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
 }
 /* Links container */
 .links-container {
-  width: 5%;
+  width: 3%;
   display: flex;
   flex-direction: column;
   gap: 10px;
   border-right: 1px solid #242424;
+  background-color: #171515;
 }
 .no-home-links-container {
-  width: 5%;
+  width: 3%;
+  background-color: #171515;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -277,17 +279,19 @@
   border-right: 1px solid #252525;
   width: 45%;
   height: 100vh;
+  border-top: 1px solid #252525;
 }
 .no-home-show-message-container {
   border-left: 1px solid #252525;
   border-right: 1px solid #252525;
-  width: 60%;
+  border-top: 1px solid #252525;
+  width: 62%;
   height: 100vh;
 }
 /* Rightbar profile container */
 .rightbar-profile-container {
   /* background-color: blue; */
-  width: 25%;
+  width: 27%;
   overflow-y: scroll;
 }
 .no-home-rightbar-profile-container {

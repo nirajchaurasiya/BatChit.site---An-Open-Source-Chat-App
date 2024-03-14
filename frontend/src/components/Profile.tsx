@@ -50,7 +50,7 @@ export default function Profile({ isGroup }: { isGroup?: boolean }) {
           />
         </div>
         <div className="profile_details" style={{ marginTop: "-150px" }}>
-          <div className="profile_image">
+          <div className="profile_image" style={{ display: "flex" }}>
             <img
               src="https://cdn-icons-png.freepik.com/512/9073/9073174.png"
               alt=""

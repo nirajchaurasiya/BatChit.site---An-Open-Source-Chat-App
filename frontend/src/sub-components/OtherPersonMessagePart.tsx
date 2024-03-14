@@ -81,7 +81,9 @@ export default function OtherPersonMessagePart({
                 )}
               </div>
             ) : (
-              <p className="message-value">{message?.content}</p>
+              <p className="message-value" style={{ maxWidth: "65%" }}>
+                {message?.content}
+              </p>
             )}
           </div>
 

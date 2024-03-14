@@ -17,6 +17,7 @@ body {
   background-color: var(--dark-theme-bg);
   color: var(--dark-theme-text);
   font-family: "Open Sans", sans-serif;
+  overflow-y: hidden;
 }
 a {
   color: var(--link-theme);

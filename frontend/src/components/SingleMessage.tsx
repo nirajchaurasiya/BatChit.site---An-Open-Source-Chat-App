@@ -288,7 +288,17 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
               >
                 <div className="user_msg_container">
                   <div className="other_user_messages">
-                    <p>{typingAlertText}...</p>
+                    {/* <p> */}
+                    {typingAlertText && (
+                      <div className="chat-bubble">
+                        <div className="typing">
+                          <div className="dot"></div>
+                          <div className="dot"></div>
+                          <div className="dot"></div>
+                        </div>
+                      </div>
+                    )}
+                    {/* </p> */}
                   </div>
                 </div>
               </div>
@@ -303,15 +313,15 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
                 className="progress-bar"
                 style={{ width: `${uploadProgress}%` }}
               ></div>
-              <p
-                onClick={() => {
-                  setFile(null);
-                }}
-              >
-                X
-              </p>
               {uploadProgress === 0 && (
                 <>
+                  <p
+                    onClick={() => {
+                      setFile(null);
+                    }}
+                  >
+                    X
+                  </p>
                   {file.type.includes("image") ? (
                     <img src={URL?.createObjectURL(file)} alt="file" />
                   ) : (
