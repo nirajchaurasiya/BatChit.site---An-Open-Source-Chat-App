@@ -83,7 +83,6 @@ export default function Home({
     e.preventDefault();
   };
 
-  console.log(widthOfWindow, userId);
   return (
     <>
       <section className="home-container">

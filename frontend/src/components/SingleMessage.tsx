@@ -22,9 +22,14 @@ import { RootState } from "../types/Rootstate";
 import { formatDateForInitialChatCreationAlert } from "../utils/messageDateFormat";
 import { Socket } from "socket.io-client";
 import { getAllMessagesWithId } from "../apis/chatActions";
-import { saveMessages } from "../features/messages/messageSlice";
+import {
+  appendMessages,
+  saveMessages,
+} from "../features/messages/messageSlice";
 import { sendFileToServer } from "../utils/sendFileToServer";
 import { useDropzone } from "react-dropzone";
+import InfiniteScroll from "react-infinite-scroll-component";
+import SmallSpinner from "../sub-components/SmallSpinner";
 export default function SingleMessage({ socket }: { socket: Socket | null }) {
   const [file, setFile] = useState<File | null>(null);
   const [typingAlertText, setTypingAlertText] = useState("");
@@ -44,8 +49,13 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
   if (!showProfileOptions) {
     return null;
   }
+  const [pageNumber, setPageNumber] = useState(1);
+  const [renderedMessagesCount, setRenderedMessagesCount] = useState(
+    pageNumber * 20
+  );
   const dispatch = useDispatch();
   const { setShowProfile, showProfile } = showProfileOptions;
+  const [totalMessages, setTotalMessages] = useState(0);
   const { chatId } = useParams();
   const loggedInUser = useSelector(
     (state: RootState) => state.auth.loggedInUser
@@ -76,10 +86,12 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
     const getAllMessages = async () => {
       setLoader(true);
       if (chatId) {
-        const messages = await getAllMessagesWithId(chatId);
-        const { success, data } = messages;
+        const allMessages = await getAllMessagesWithId(chatId, pageNumber);
+        const { success, messages, totalMessages } = allMessages;
+        const reversedMessages = messages?.reverse();
         if (success) {
-          dispatch(saveMessages(data));
+          dispatch(saveMessages(reversedMessages));
+          setTotalMessages(totalMessages);
         }
       }
       setLoader(false);
@@ -228,6 +240,24 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
       console.error("Error initiating audio call:", error);
     }
   };
+  const fetchMoreData = async () => {
+    if (chatId) {
+      const nextPageNumber = pageNumber + 1;
+      setPageNumber(nextPageNumber);
+      const remainingMessages = await getAllMessagesWithId(
+        chatId,
+        nextPageNumber
+      );
+      const { success, messages, totalMessages } = remainingMessages;
+      const reversedMessages = messages?.reverse();
+      if (success) {
+        dispatch(appendMessages(reversedMessages));
+        setTotalMessages(totalMessages);
+        const renderedCount = renderedMessagesCount + messages?.length;
+        setRenderedMessagesCount(renderedCount);
+      }
+    }
+  };
 
   return loader ? (
     <Spinner />
@@ -258,52 +288,69 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
             <IoVideocam />
           </div>
         </div>
+
         {/* All Messages */}
-        <div className="user-msg-cntainer">
-          <div className="alert_msg">
-            <p>
-              Created this chat on{" "}
-              {formatDateForInitialChatCreationAlert(
-                chats?.find((field) => field._id === chatId)?.createdAt
-              )}{" "}
-            </p>
-          </div>
-          <div ref={messageContainerRef}>
-            {/* Message Container */}
-            {messages?.map((message) => {
-              return (
-                <div key={message?._id} className="users_conversation">
-                  {loggedInUser._id === message.senderDetails?._id ? (
-                    <MyMessagePart message={message} />
-                  ) : (
-                    <OtherPersonMessagePart message={message} />
+        <div className="user-msg-cntainer" id="scrollableDiv">
+          <InfiniteScroll
+            dataLength={totalMessages}
+            next={fetchMoreData}
+            style={{ display: "flex", flexDirection: "column-reverse" }} //To put endMessage and loader to the top.
+            inverse={true} //
+            hasMore={totalMessages > renderedMessagesCount}
+            loader={
+              <div>
+                <br />
+                <SmallSpinner />
+              </div>
+            }
+            scrollableTarget="scrollableDiv"
+            height={`80vh`}
+          >
+            <div ref={messageContainerRef}>
+              <div className="alert_msg">
+                <p>
+                  Created this chat on
+                  {formatDateForInitialChatCreationAlert(
+                    chats?.find((field) => field._id === chatId)?.createdAt
                   )}
-                </div>
-              );
-            })}
-            {showTyping && (
-              <div
-                style={{ margin: "10px" }}
-                className="user_conversation_container"
-              >
-                <div className="user_msg_container">
-                  <div className="other_user_messages">
-                    {/* <p> */}
-                    {typingAlertText && (
-                      <div className="chat-bubble">
-                        <div className="typing">
-                          <div className="dot"></div>
-                          <div className="dot"></div>
-                          <div className="dot"></div>
-                        </div>
-                      </div>
+                </p>
+              </div>
+              {/* Message Container */}
+              {messages?.map((message) => {
+                return (
+                  <div key={message?._id} className="users_conversation">
+                    {loggedInUser._id === message.senderDetails?._id ? (
+                      <MyMessagePart message={message} />
+                    ) : (
+                      <OtherPersonMessagePart message={message} />
                     )}
-                    {/* </p> */}
+                  </div>
+                );
+              })}
+              {showTyping && (
+                <div
+                  style={{ margin: "10px" }}
+                  className="user_conversation_container"
+                >
+                  <div className="user_msg_container">
+                    <div className="other_user_messages">
+                      {/* <p> */}
+                      {typingAlertText && (
+                        <div className="chat-bubble">
+                          <div className="typing">
+                            <div className="dot"></div>
+                            <div className="dot"></div>
+                            <div className="dot"></div>
+                          </div>
+                        </div>
+                      )}
+                      {/* </p> */}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          </InfiniteScroll>
         </div>
         {/* Input Box */}
         <div className="selected-file">
@@ -332,7 +379,6 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
             </div>
           )}
         </div>
-        {/* {isDragActive ? <p>Drop</p> : <p>Drag</p>} */}
         <form onSubmit={handleSendMessage}>
           <div className="input-box">
             <div

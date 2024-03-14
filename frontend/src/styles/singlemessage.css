@@ -77,8 +77,14 @@
   height: 30px;
 }
 /* All messages */
+.infinite-scroll-component::-webkit-scrollbar {
+  width: 0;
+}
 .user-msg-cntainer {
-  overflow-y: scroll;
+  overflow: scroll;
+}
+.user-msg-cntainer::-webkit-scrollbar {
+  width: 0;
 }
 
 .alert_msg {
@@ -157,10 +163,12 @@
 #send-file {
   cursor: pointer;
 }
-.input-box {
-  bottom: 0;
+.single-message-container form {
+  position: sticky !important;
   position: -webkit-sticky;
-  position: sticky;
+  bottom: 0 !important;
+}
+.input-box {
   display: flex;
   align-items: center;
   padding: 5px;
@@ -236,6 +244,7 @@
 }
 .send-btn svg {
   font-size: 25px;
+  color: green;
 }
 .send-btn button:hover {
   background-color: #cecece1a;

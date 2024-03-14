@@ -41,11 +41,12 @@ export const addChat = async (fullName: string, _id: string) => {
 }
 
 
-export const getAllMessagesWithId = async (chatId: string) => {
-    const allMessages = await axios.get(`${chatsBackendURL}/individual/get-messages/${chatId}`, Authorization)
-    const { statusCode, success, code, data } = allMessages.data
+export const getAllMessagesWithId = async (chatId: string, pageNumber: Number) => {
+    const allMessages = await axios.get(`${chatsBackendURL}/individual/get-sliced-messages/${chatId}/${pageNumber}`, Authorization)
+    const { statusCode, success, code, } = allMessages.data
+    const { messages, totalMessages } = allMessages?.data?.data
     if (success && statusCode === 200) {
-        return { success, code, data }
+        return { success, code, messages, totalMessages }
     }
     return { success: false, }
 }

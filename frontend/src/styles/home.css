@@ -278,8 +278,7 @@
   border-left: 1px solid #252525;
   border-right: 1px solid #252525;
   width: 45%;
-  height: 100vh;
-  border-top: 1px solid #252525;
+  /* height: 100vh; */
 }
 .no-home-show-message-container {
   border-left: 1px solid #252525;

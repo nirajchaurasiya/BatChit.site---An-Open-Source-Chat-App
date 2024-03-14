@@ -353,29 +353,6 @@ const sendIndividualMessage = asyncHandler(async (req, res) => {
             },
          },
       },
-      //   {
-      //      $lookup: {
-      //         from: "individualchats",
-      //         localField: "chat",
-      //         foreignField: "_id",
-      //         as: "chatDetails",
-      //         pipeline: [
-      //            {
-      //               $project: {
-      //                  _id: 1,
-      //                  chatName: 1,
-      //               },
-      //            },
-      //         ],
-      //      },
-      //   },
-      //   {
-      //      $addFields: {
-      //         chatDetails: {
-      //            $arrayElemAt: ["$chatDetails", 0],
-      //         },
-      //      },
-      //   },
       {
          $unset: ["sender", "chat", "readBy"],
       },
@@ -457,9 +434,101 @@ const getIndividualMessages = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, messages, "Messages retrieved success", 8000));
 });
 
+const getSlicedMessages = asyncHandler(async (req, res) => {
+   const { page = 1, chatId } = req.params;
+
+   if (!chatId) {
+      throw new ApiError(404, "Chat id is empty");
+   }
+
+   const resultPerPage = 20;
+
+   const skip = (page - 1) * resultPerPage;
+
+   const totalMessages = await IndividualChatMessage?.find({ chat: chatId });
+
+   const messages = await IndividualChatMessage.aggregate([
+      {
+         $match: { chat: new mongoose.Types.ObjectId(chatId) },
+      },
+      {
+         $sort: { createdAt: -1 },
+      },
+      {
+         $skip: skip,
+      },
+      {
+         $limit: resultPerPage,
+      },
+      {
+         $lookup: {
+            from: "users",
+            foreignField: "_id",
+            localField: "sender",
+            as: "senderDetails",
+            pipeline: [
+               {
+                  $project: {
+                     _id: 1,
+                     fullName: 1,
+                     background: 1,
+                     bio: 1,
+                  },
+               },
+            ],
+         },
+      },
+      {
+         $addFields: {
+            senderDetails: {
+               $arrayElemAt: ["$senderDetails", 0],
+            },
+         },
+      },
+      {
+         $lookup: {
+            from: "individualchats",
+            localField: "chat",
+            foreignField: "_id",
+            as: "chatDetails",
+            pipeline: [
+               {
+                  $project: {
+                     _id: 1,
+                     chatName: 1,
+                  },
+               },
+            ],
+         },
+      },
+      {
+         $addFields: {
+            chatDetails: {
+               $arrayElemAt: ["$chatDetails", 0],
+            },
+         },
+      },
+      {
+         $unset: ["sender", "chat"],
+      },
+   ]);
+
+   return res
+      .status(200)
+      .json(
+         new ApiResponse(
+            200,
+            { messages, totalMessages: totalMessages?.length },
+            "Messages retrieved",
+            80001
+         )
+      );
+});
+
 export {
    createIndividualChat,
    getIndividualChat,
    sendIndividualMessage,
    getIndividualMessages,
+   getSlicedMessages,
 };

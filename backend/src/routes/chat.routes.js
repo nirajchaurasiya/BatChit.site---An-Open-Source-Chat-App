@@ -3,6 +3,7 @@ import {
    createIndividualChat,
    getIndividualChat,
    getIndividualMessages,
+   getSlicedMessages,
    sendIndividualMessage,
 } from "../controllers/chat.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -20,5 +21,9 @@ router
 router
    .route("/individual/get-messages/:chatId")
    .get(verifyJWT, getIndividualMessages);
+
+router
+   .route("/individual/get-sliced-messages/:chatId/:page")
+   .get(verifyJWT, getSlicedMessages);
 
 export default router;
