@@ -525,10 +525,103 @@ const getSlicedMessages = asyncHandler(async (req, res) => {
       );
 });
 
+const editMessage = asyncHandler(async (req, res) => {
+   try {
+      const { messageId } = req?.params;
+      const { content } = req?.body;
+      if ([messageId, content].some((field) => field.trim() === "")) {
+         throw new ApiError(404, "Fields can't be empty");
+      }
+
+      console.log(messageId, content);
+
+      await IndividualChatMessage?.findByIdAndUpdate(
+         messageId,
+         { $set: { content: content } },
+         {
+            new: true,
+         }
+      );
+
+      const getEditedMessage = await IndividualChatMessage.aggregate([
+         {
+            $match: {
+               $and: [{ _id: new mongoose.Types.ObjectId(messageId) }],
+            },
+         },
+         {
+            $lookup: {
+               from: "users",
+               foreignField: "_id",
+               localField: "sender",
+               as: "senderDetails",
+               pipeline: [
+                  {
+                     $project: {
+                        _id: 1,
+                        fullName: 1,
+                        background: 1,
+                        bio: 1,
+                     },
+                  },
+               ],
+            },
+         },
+         {
+            $addFields: {
+               senderDetails: {
+                  $arrayElemAt: ["$senderDetails", 0],
+               },
+            },
+         },
+         {
+            $lookup: {
+               from: "individualchats",
+               localField: "chat",
+               foreignField: "_id",
+               as: "chatDetails",
+               pipeline: [
+                  {
+                     $project: {
+                        _id: 1,
+                        chatName: 1,
+                     },
+                  },
+               ],
+            },
+         },
+         {
+            $addFields: {
+               chatDetails: {
+                  $arrayElemAt: ["$chatDetails", 0],
+               },
+            },
+         },
+         {
+            $unset: ["sender", "chat"],
+         },
+      ]);
+
+      return res
+         .status(200)
+         .json(
+            new ApiResponse(
+               200,
+               getEditedMessage[0],
+               "Message edited success",
+               10001
+            )
+         );
+   } catch (error) {
+      throw new ApiError(500, error?.message);
+   }
+});
+
 export {
    createIndividualChat,
    getIndividualChat,
    sendIndividualMessage,
    getIndividualMessages,
    getSlicedMessages,
+   editMessage,
 };

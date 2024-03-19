@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const app = express();
 const PORT = 4000;
 const cors = require("cors");
+require("dotenv").config();
 
 // Serve uploaded images statically
 app.use("/uploads", express.static("uploads"));

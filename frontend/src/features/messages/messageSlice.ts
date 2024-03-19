@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-// import { Chat } from "../../types/Types";
+import { Messages } from "../../types/Types";
 
 export const messagesSlice = createSlice({
     name: "messages",
@@ -18,11 +18,17 @@ export const messagesSlice = createSlice({
         // For appending next messages user communicate
         appendNextMessage: (state: any, action) => {
             state.allMessages = [...state.allMessages, ...action.payload]
+        },
+        saveEditedMessage: (state, action) => {
+            const messageToUpdate = state.allMessages.find(field => (field as Messages)._id === action.payload._id);
+            if (messageToUpdate) {
+                (messageToUpdate as Messages).content = action.payload.content;
+            }
         }
 
     },
 });
 
-export const { saveMessages, appendMessages, appendNextMessage } = messagesSlice.actions;
+export const { saveMessages, appendMessages, appendNextMessage, saveEditedMessage } = messagesSlice.actions;
 
 export default messagesSlice.reducer;

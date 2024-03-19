@@ -9,7 +9,7 @@ import React, {
 import "../styles/singlemessage.css";
 import { IoCall, IoVideocam } from "react-icons/io5";
 
-import { MdOutlineAttachFile } from "react-icons/md";
+import { MdModeEditOutline, MdOutlineAttachFile } from "react-icons/md";
 import MyMessagePart from "../sub-components/MyMessagePart";
 import OtherPersonMessagePart from "../sub-components/OtherPersonMessagePart";
 import { ToggleProfile } from "../context/ToggleProfile";
@@ -21,9 +21,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../types/Rootstate";
 import { formatDateForInitialChatCreationAlert } from "../utils/messageDateFormat";
 import { Socket } from "socket.io-client";
-import { getAllMessagesWithId } from "../apis/chatActions";
+import { editMessage, getAllMessagesWithId } from "../apis/chatActions";
 import {
   appendMessages,
+  saveEditedMessage,
   saveMessages,
 } from "../features/messages/messageSlice";
 import { sendFileToServer } from "../utils/sendFileToServer";
@@ -36,7 +37,7 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [messageValue, setMessageValue] = useState("");
   const [showTyping, setShowTyping] = useState(false);
-
+  const [messageIdToEdit, setMessageIdToEdit] = useState("");
   const onDrop = useCallback((acceptedFiles: Array<File>) => {
     setFile(acceptedFiles[0]);
   }, []);
@@ -259,6 +260,23 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
     }
   };
 
+  const handleEditMessage = (messageId: string) => {
+    const findMessage = messages?.find((field) => field._id === messageId);
+    if (findMessage && findMessage?.content) {
+      setMessageValue(findMessage?.content);
+      setMessageIdToEdit(findMessage?._id);
+    }
+  };
+
+  const editMessageAction = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const response = await editMessage(messageIdToEdit, messageValue);
+    const { success, data } = response;
+    if (success) {
+      dispatch(saveEditedMessage(data));
+    }
+  };
+
   return loader ? (
     <Spinner />
   ) : (
@@ -320,7 +338,10 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
                 return (
                   <div key={message?._id} className="users_conversation">
                     {loggedInUser._id === message.senderDetails?._id ? (
-                      <MyMessagePart message={message} />
+                      <MyMessagePart
+                        handleClickMessage={handleEditMessage}
+                        message={message}
+                      />
                     ) : (
                       <OtherPersonMessagePart message={message} />
                     )}
@@ -379,7 +400,9 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
             </div>
           )}
         </div>
-        <form onSubmit={handleSendMessage}>
+        <form
+          onSubmit={messageIdToEdit ? editMessageAction : handleSendMessage}
+        >
           <div className="input-box">
             <div
               className="file-icon"
@@ -406,7 +429,7 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
               </div>
               <div className="send-btn">
                 <button>
-                  <IoMdSend />
+                  {messageIdToEdit ? <MdModeEditOutline /> : <IoMdSend />}
                 </button>
               </div>
             </div>

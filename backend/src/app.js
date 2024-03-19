@@ -1,5 +1,5 @@
 import express from "express";
-import { user, addUser, removeUser } from "./user.store.js";
+import { addUser, removeUser } from "./user.store.js";
 import cookieParser from "cookie-parser";
 import http from "http"; // Import http module for Socket.IO
 import { Server } from "socket.io"; // Import Server class from Socket.IO

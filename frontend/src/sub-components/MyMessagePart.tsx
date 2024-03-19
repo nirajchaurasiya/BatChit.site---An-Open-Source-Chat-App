@@ -4,9 +4,14 @@ import { messageDateFormat } from "../utils/messageDateFormat";
 import { IoIosArrowDown, IoMdCheckmark } from "react-icons/io";
 import { IoCheckmarkDone } from "react-icons/io5";
 
-export default function MyMessagePart({ message }: { message: Messages }) {
+export default function MyMessagePart({
+  message,
+  handleClickMessage,
+}: {
+  message: Messages;
+  handleClickMessage: (messageId: string) => void;
+}) {
   const [media, setMedia] = useState<string | undefined>(undefined);
-  const [showMenu, setShowMenu] = useState(false);
   const [scaleFactor, setScaleFactor] = useState<number>(1.0);
   const maxScale = 2.0;
   const minScale = 0.5;
@@ -65,23 +70,43 @@ export default function MyMessagePart({ message }: { message: Messages }) {
                     )}
                   </div>
                 )}
+                <div className="dropdown">
+                  <button className="dropbtn">
+                    <p>
+                      <IoIosArrowDown />
+                    </p>
+                  </button>
+                  <div className="dropdown-content">
+                    <p
+                      onClick={() => {
+                        handleClickMessage(message?._id);
+                      }}
+                    >
+                      Edit
+                    </p>
+                    <p>Delete</p>
+                  </div>
+                </div>
               </div>
             ) : (
               <>
-                <div
-                  className="chat-menu-dots"
-                  onClick={() => {
-                    setShowMenu(!showMenu);
-                  }}
-                >
-                  <IoIosArrowDown />
-                </div>
-                {showMenu && (
-                  <div className="chat-menu">
-                    <p>Edit</p>
+                <div className="dropdown">
+                  <button className="dropbtn">
+                    <p>
+                      <IoIosArrowDown />
+                    </p>
+                  </button>
+                  <div className="dropdown-content">
+                    <p
+                      onClick={() => {
+                        handleClickMessage(message?._id);
+                      }}
+                    >
+                      Edit
+                    </p>
                     <p>Delete</p>
                   </div>
-                )}
+                </div>
                 <p className="message-value">{message?.content}</p>
               </>
             )}

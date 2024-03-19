@@ -301,7 +301,7 @@
 .message-media img,
 .message-media video {
   width: 300px;
-  background-color: #2b9f4e;
+  background-color: #292929;
   object-fit: cover;
   margin-bottom: -10px;
   border-bottom-right-radius: 20px;
@@ -313,7 +313,7 @@
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-end;
-  background-color: #2b9f4e;
+  background-color: #292929;
   border-bottom-right-radius: 20px;
   margin-bottom: 10px;
   width: min-content;
@@ -341,7 +341,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  /* From https://css.glass */
   background: rgba(255, 255, 255, 0.2);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(5px);
@@ -418,24 +417,58 @@
     background-color: #b5d9cb;
   }
 }
-.chat-menu-dots {
+/*  */
+
+.dropbtn {
+  background-color: transparent;
+  color: white;
+  padding: 6px;
+  border: none;
   display: flex;
+  justify-content: center;
   align-items: center;
-  margin-right: 10px;
   cursor: pointer;
 }
-.chat-menu {
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  margin-left: -40px;
+  margin-top: -20px;
+  user-select: none;
   position: absolute;
-  margin-right: 70px;
-  border-radius: 5px;
-  background-color: #232323;
-  border: 1px solid rgb(53, 52, 52);
+  background-color: #262626;
+  border-radius: 3px;
+  box-shadow: 0px 8px 16px 0px rgba(13, 255, 0, 0.2);
+  z-index: 1;
+  border: 1px solid rgb(68, 66, 66);
 }
-.chat-menu p {
+
+.dropdown-content p {
   cursor: pointer;
-  padding: 5px;
-  font-size: 14px;
+  color: black;
+  color: white;
+  padding: 2px 4px;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  border-bottom: 1px solid rgb(55, 55, 55);
+  font-size: 12px;
+  padding: 4px;
+  font-weight: 600;
 }
-.chat-menu p:hover {
-  background-color: #2b9f4e;
+.dropdown-content p:last-child {
+  border-bottom: 0px solid white;
+}
+
+.dropdown-content p:hover {
+  background-color: #1c6824;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
 }

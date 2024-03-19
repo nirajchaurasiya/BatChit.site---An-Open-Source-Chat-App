@@ -17,19 +17,13 @@ import Navbar from "./components/Navbar";
 
 export default function App() {
   const [socket, setSocket] = useState<Socket | null>(null);
-
   const REACT_APP_BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
-
   const [loader, setLoader] = useState(true);
-
   const loggedInUser = useSelector(
     (state: RootState) => state.auth.loggedInUser
   );
-
   const accessToken: string | null = getCookie("accessToken");
-
   const dispatch = useDispatch<Dispatch>();
-
   useEffect(() => {
     setSocket(
       io(REACT_APP_BACKEND_URL, {
@@ -72,11 +66,9 @@ export default function App() {
     };
     fetchUser();
   }, []);
-
   if (accessToken) {
     if (loader) return <Spinner />;
   }
-
   return (
     <BrowserRouter>
       <main>
