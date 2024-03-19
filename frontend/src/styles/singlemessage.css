@@ -418,3 +418,24 @@
     background-color: #b5d9cb;
   }
 }
+.chat-menu-dots {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  cursor: pointer;
+}
+.chat-menu {
+  position: absolute;
+  margin-right: 70px;
+  border-radius: 5px;
+  background-color: #232323;
+  border: 1px solid rgb(53, 52, 52);
+}
+.chat-menu p {
+  cursor: pointer;
+  padding: 5px;
+  font-size: 14px;
+}
+.chat-menu p:hover {
+  background-color: #2b9f4e;
+}

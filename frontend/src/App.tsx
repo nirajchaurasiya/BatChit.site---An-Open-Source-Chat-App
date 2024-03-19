@@ -11,7 +11,7 @@ import Spinner from "./components/Spinner";
 import PageNotFound from "./components/PageNotFound";
 import { Dispatch } from "@reduxjs/toolkit";
 import { login } from "./apis/login";
-import { saveMessages } from "./features/messages/messageSlice";
+import { appendNextMessage } from "./features/messages/messageSlice";
 import { saveChatCards } from "./features/chat/chatSlice";
 import Navbar from "./components/Navbar";
 export default function App() {
@@ -40,7 +40,7 @@ export default function App() {
   useEffect(() => {
     const updateIndividualMessage = (data: any) => {
       const { messages, receiverChats, senderChats } = data;
-      dispatch(saveMessages(messages));
+      dispatch(appendNextMessage(messages));
       if (senderChats) {
         dispatch(saveChatCards(senderChats));
       } else dispatch(saveChatCards(receiverChats));

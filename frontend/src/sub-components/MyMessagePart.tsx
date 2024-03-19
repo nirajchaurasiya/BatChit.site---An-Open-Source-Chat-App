@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Messages } from "../types/Types";
 import { messageDateFormat } from "../utils/messageDateFormat";
-import { IoMdCheckmark } from "react-icons/io";
+import { IoIosArrowDown, IoMdCheckmark } from "react-icons/io";
 import { IoCheckmarkDone } from "react-icons/io5";
 
 export default function MyMessagePart({ message }: { message: Messages }) {
   const [media, setMedia] = useState<string | undefined>(undefined);
+  const [showMenu, setShowMenu] = useState(false);
   const [scaleFactor, setScaleFactor] = useState<number>(1.0);
   const maxScale = 2.0;
   const minScale = 0.5;
@@ -35,7 +36,6 @@ export default function MyMessagePart({ message }: { message: Messages }) {
       document.removeEventListener("wheel", handleScroll);
     };
   }, [scaleFactor]);
-
   return (
     <>
       <div className="user_conversation_container">
@@ -67,7 +67,23 @@ export default function MyMessagePart({ message }: { message: Messages }) {
                 )}
               </div>
             ) : (
-              <p className="message-value">{message?.content}</p>
+              <>
+                <div
+                  className="chat-menu-dots"
+                  onClick={() => {
+                    setShowMenu(!showMenu);
+                  }}
+                >
+                  <IoIosArrowDown />
+                </div>
+                {showMenu && (
+                  <div className="chat-menu">
+                    <p>Edit</p>
+                    <p>Delete</p>
+                  </div>
+                )}
+                <p className="message-value">{message?.content}</p>
+              </>
             )}
           </div>
 
