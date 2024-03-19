@@ -17,9 +17,36 @@ export default function Navbar() {
             style={{ fill: "#2b9f4e" }}
             d="M51,7V3.793C51,1.728,49.272,0,47.207,0H10.793C8.728,0,7,1.728,7,3.793V7H51z"
           />
-          <circle style={{ fill: "#FFFFFF", cx: "16", cy: "27.985", r: "3" }} />
-          <circle style={{ fill: "#FFFFFF", cx: "29", cy: "27.985", r: "3" }} />
-          <circle style={{ fill: "#FFFFFF", cx: "42", cy: "27.985", r: "3" }} />
+          <circle
+            style={
+              {
+                fill: "#FFFFFF",
+                cx: "16",
+                cy: "27.985",
+                r: "3",
+              } as React.CSSProperties
+            }
+          />
+          <circle
+            style={
+              {
+                fill: "#FFFFFF",
+                cx: "29",
+                cy: "27.985",
+                r: "3",
+              } as React.CSSProperties
+            }
+          />
+          <circle
+            style={
+              {
+                fill: "#FFFFFF",
+                cx: "42",
+                cy: "27.985",
+                r: "3",
+              } as React.CSSProperties
+            }
+          />
         </g>
       </svg>
       <p>BatChit.site</p>
