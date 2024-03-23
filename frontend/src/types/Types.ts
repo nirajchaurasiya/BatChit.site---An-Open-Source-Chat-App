@@ -99,6 +99,7 @@ export type GroupedMemberType = [
     _id: string;
     fullName: string;
     bio: string;
+    email: string
   }
 ];
 export type SearchUserType = [
@@ -106,6 +107,7 @@ export type SearchUserType = [
     _id: string;
     fullName: string;
     bio: string;
+    email: string
   }
 ];
 export type GroupedUserType = {

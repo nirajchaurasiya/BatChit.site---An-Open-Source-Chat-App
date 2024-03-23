@@ -474,7 +474,16 @@
   justify-content: center;
   align-items: center;
 }
-
+.add-chat-mid-container {
+  height: 95vh;
+  overflow-y: scroll;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.add-chat-mid-container::-webkit-scrollbar {
+  width: 0;
+}
 .form-control {
   padding: 50px;
 }
@@ -506,10 +515,22 @@
   border-radius: 5px;
   border: 1px solid rgb(44, 43, 43);
 }
-.show-searched-user-in-group-message::-webkit-scrollbar {
+.show-added-user-in-group-message {
+  padding: 10px;
+  overflow-y: scroll;
+  height: 100px;
+  width: 100%;
+  background-color: #171717;
+  margin-top: 20px;
+  border-radius: 5px;
+  border: 1px solid rgb(44, 43, 43);
+}
+.show-searched-user-in-group-message::-webkit-scrollbar,
+.show-added-user-in-group-message::-webkit-scrollbar {
   width: 10px;
 }
-.show-searched-user-in-group-message::-webkit-scrollbar-thumb {
+.show-searched-user-in-group-message::-webkit-scrollbar-thumb,
+.show-added-user-in-group-message::-webkit-scrollbar-thumb {
   background-color: #282828;
   border-radius: 20px;
 }
@@ -519,4 +540,30 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 5px;
+}
+.added-users {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  width: 100%;
+}
+.added-user-card {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #373636;
+  width: max-content;
+  padding: 4px;
+  border: 1px solid rgb(81, 81, 81);
+  border-radius: 20px;
+  font-size: 10px !important;
+}
+.added-user-card div p {
+  color: white !important;
+  font-size: 9px !important;
+}
+.added-user-card svg {
+  margin-bottom: -3px;
+  cursor: pointer;
 }

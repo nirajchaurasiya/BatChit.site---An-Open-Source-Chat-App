@@ -4,6 +4,12 @@ import { usersBackendURL } from "../utils/usersBackendURL";
 export const getSearchedResult = async (query: string) => {
 
   const searchUser = await axios.get(`${usersBackendURL}/search/${query}`)
-  const { data } = searchUser.data
-  return data
+  console.log(searchUser.data)
+  const { data, success, statusCode } = searchUser.data
+  if (success && statusCode === 200) {
+    return { data, success }
+  }
+  else {
+    return { success: false }
+  }
 };

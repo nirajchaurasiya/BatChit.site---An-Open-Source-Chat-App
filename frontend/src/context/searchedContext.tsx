@@ -1,8 +1,9 @@
 import React, { createContext, useState } from "react";
 
-type SearchUser = {
-  id: string;
-  name: string;
+export type SearchUser = {
+  _id: string;
+  fullName: string;
+  email: string;
   bio: string;
 };
 

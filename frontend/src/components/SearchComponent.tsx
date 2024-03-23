@@ -31,9 +31,10 @@ export default function SearchComponent({
     if (searchQuery.trim() !== "") {
       setLoading(true);
       const getUserFromSearch = await getSearchedResult(searchQuery);
-      getUserFromSearch?.length < 1 && setInitialMsg("No user found");
-      if (getUserFromSearch?.length > 1) {
-        setSearchUser(getUserFromSearch);
+      const { success, data } = getUserFromSearch;
+      data?.length < 1 && !success && setInitialMsg("No user found");
+      if (data?.length > 1) {
+        setSearchUser(data);
       }
       setLoading(false);
     }

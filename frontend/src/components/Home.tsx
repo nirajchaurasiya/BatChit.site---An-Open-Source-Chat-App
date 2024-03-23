@@ -8,7 +8,7 @@ import { ToggleProfile } from "../context/ToggleProfile";
 import { ImCross } from "react-icons/im";
 import { MdBlock, MdDelete, MdVerified } from "react-icons/md";
 import SearchComponent from "./SearchComponent";
-import { SearchUserContext } from "../context/searchedContext";
+import { SearchUser, SearchUserContext } from "../context/searchedContext";
 import UserProfile from "./UserProfile";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -18,6 +18,8 @@ import { AlertMessageType } from "../types/AlertTypes";
 import { AlertMessages } from "../AlertMsg/alertMsg";
 import { displayAlert } from "../utils/alertUtils";
 import SmallSpinner from "../sub-components/SmallSpinner";
+import { getSearchedResult } from "../apis/getSearchedResult";
+import { FaMinus, FaPlus } from "react-icons/fa";
 
 export default function Home({
   children,
@@ -40,10 +42,12 @@ export default function Home({
   const [msgType, setMsgType] = useState<AlertMessageType>("email");
   const [addGroupChat, setAddGroupChat] = useState(false);
   const showProfileOptions = useContext(ToggleProfile);
-
+  const [initialStateForSearchUserField, setInitialStateForSearchUserField] =
+    useState<JSX.Element | string>("Search a user");
+  const [addedUser, setAddedUser] = useState<SearchUser[] | []>([]);
   const searchUserOptions = useContext(SearchUserContext);
   if (!searchUserOptions) return null;
-  const { searchUser } = searchUserOptions;
+  const { searchUser, setSearchUser } = searchUserOptions;
 
   if (!showProfileOptions) {
     return null;
@@ -80,12 +84,50 @@ export default function Home({
 
   const chats = useSelector((state: RootState) => state.chats.allChatCards);
 
-  const handlerSearchUserInput = async () => {};
+  const debounce = (func: Function, delay: number) => {
+    let timer: NodeJS.Timeout;
+    return function (this: any, ...args: any[]) {
+      clearTimeout(timer);
+      timer = setTimeout(() => func.apply(this, args), delay);
+    };
+  };
+
+  const delayedApiCall = debounce(async (value: string) => {
+    if (value) {
+      setInitialStateForSearchUserField(<SmallSpinner />);
+      const users = await getSearchedResult(value);
+      const { success, data } = users;
+      if (success) {
+        setSearchUser(data);
+        setInitialStateForSearchUserField("Search a user");
+      }
+    } else {
+      setSearchUser([]);
+    }
+  }, 1000);
+
+  const handlerSearchUserInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    delayedApiCall(inputValue);
+  };
 
   const handleAddGroupChat = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   };
 
+  const addTheUser = (user: SearchUser) => {
+    const isUserExist = addedUser.find((field) => field?._id === user?._id);
+    if (!isUserExist) {
+      setAddedUser((prevUsers) => [...prevUsers, user]);
+    }
+  };
+
+  const removeTheUser = (user: SearchUser) => {
+    const isUserExist = addedUser.find((field) => field?._id === user?._id);
+    if (isUserExist) {
+      setAddedUser((prevUser) => prevUser.filter((e) => e._id !== user?._id));
+    }
+  };
   return (
     <>
       <section className="home-container">
@@ -655,57 +697,89 @@ export default function Home({
                   <label htmlFor="add-group-user">Add Users</label>
                   <input
                     placeholder="Start typing to search a user"
+                    onChange={handlerSearchUserInput}
                     type="text"
                     id="add-group-user"
                   />
                 </div>
-                <div className="show-searched-user-in-group-message">
-                  <div className="show-spinner-classname">Search a user</div>
-                  {/* <div className="show-spinner-classname">
-                    <SmallSpinner />
-                  </div> */}
-                  {/* <div className="search-users">
-                    <a
-                      className="search-user-card"
-                      href="/search?query=65d2d7e396d4799c52faa4f0"
-                      style={{ color: "white" }}
-                    >
-                      <div className="search-profile">
-                        <p>N</p>
+                {searchUser.length > 0 && (
+                  <div className="show-searched-user-in-group-message">
+                    {searchUser.length === 0 ? (
+                      <div className="show-spinner-classname">
+                        {initialStateForSearchUserField}
                       </div>
-                      <div className="card-user-desc">
-                        <p>Niraj Chaurasiya</p>
-                        <p>nirajkumarchaurasiya6@gmail.com</p>
+                    ) : (
+                      <div className="search-users">
+                        {searchUser?.map((user) => {
+                          return (
+                            <div key={user?._id} className="search-user-card">
+                              <div className="search-profile">
+                                <p>{user.fullName?.slice(0, 1)}</p>
+                              </div>
+                              <div className="card-user-desc">
+                                <p>{user?.fullName}</p>
+                                <p title={user?.email}>
+                                  {user?.email?.slice(0, 30)}...
+                                </p>
+                              </div>
+                              <div>
+                                {addedUser.find(
+                                  (field) => field?._id === user?._id
+                                ) ? (
+                                  <FaMinus
+                                    color="red"
+                                    onClick={() => removeTheUser(user)}
+                                  />
+                                ) : (
+                                  <FaPlus
+                                    color="green"
+                                    onClick={() => addTheUser(user)}
+                                  />
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                    </a>
-                    <a
-                      className="search-user-card"
-                      href="/search?query=65e0885a3e1148639509a526"
-                      style={{ color: "white" }}
-                    >
-                      <div className="search-profile">
-                        <p>D</p>
+                    )}
+                  </div>
+                )}
+                {addedUser.length > 0 && (
+                  <div className="show-added-user-in-group-message">
+                    {addedUser.length === 0 ? (
+                      <div className="show-spinner-classname">
+                        Added user will appear here
                       </div>
-                      <div className="card-user-desc">
-                        <p>Dev Niraj</p>
-                        <p>Hey there.</p>
+                    ) : (
+                      <div className="added-users">
+                        {addedUser?.map((user) => {
+                          return (
+                            <div key={user?._id} className="added-user-card">
+                              <div>
+                                {addedUser.find(
+                                  (field) => field?._id === user?._id
+                                ) ? (
+                                  <FaMinus
+                                    color="red"
+                                    onClick={() => removeTheUser(user)}
+                                  />
+                                ) : (
+                                  <FaPlus
+                                    color="green"
+                                    onClick={() => addTheUser(user)}
+                                  />
+                                )}
+                              </div>
+                              <div className="card-user-desc">
+                                <p title={user?.email}>{user?.email}</p>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                    </a>
-                    <a
-                      className="search-user-card"
-                      href="/search?query=65ea7ff4fc92ec8499bab840"
-                      style={{ color: "white" }}
-                    >
-                      <div className="search-profile">
-                        <p>N</p>
-                      </div>
-                      <div className="card-user-desc">
-                        <p>Niraj Chaurasiya</p>
-                        <p>Hey there!</p>
-                      </div>
-                    </a>
-                  </div> */}
-                </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="add-btn-control">
                   <button type="submit">Add Chat</button>
