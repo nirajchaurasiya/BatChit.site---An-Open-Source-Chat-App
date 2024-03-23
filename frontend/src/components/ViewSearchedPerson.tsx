@@ -12,6 +12,7 @@ import { saveChatCards } from "../features/chat/chatSlice";
 import { AlertMessageType } from "../types/AlertTypes";
 import { displayAlert } from "../utils/alertUtils";
 import { AlertMessages } from "../AlertMsg/alertMsg";
+import { getAlert } from "../utils/getAlertMsgWithType";
 
 export default function ViewSearchedPerson({
   widthOfWindow,
@@ -50,12 +51,19 @@ export default function ViewSearchedPerson({
   const handleAddChat = async () => {
     const { fullName, _id } = searchedObject as ViewSearchedPersonType;
     const response = await addChat(fullName, _id);
-    const { success, data, code } = response;
+    const { success, data, code, status } = response;
     if (success) {
       dispatch(saveChatCards(data));
       displayAlert(setShowAlert, setCode, setMsgType, code, "chatCards", 2000);
-    } else {
-      displayAlert(setShowAlert, setCode, setMsgType, code, "chatCards", 2000);
+    } else if (status) {
+      const alertMsgCode = getAlert(status, "chatCards");
+      displayAlert(
+        setShowAlert,
+        setCode,
+        setMsgType,
+        alertMsgCode,
+        "chatCards"
+      );
     }
   };
 

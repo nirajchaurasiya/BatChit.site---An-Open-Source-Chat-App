@@ -464,6 +464,7 @@
   position: fixed;
   height: 100vh;
   width: 100vw;
+  top: 0;
   background: rgba(255, 255, 255, 0.2);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(1px);
@@ -494,4 +495,28 @@
 }
 .cancel-btn button {
   background-color: rgb(255, 0, 0);
+}
+.show-searched-user-in-group-message {
+  overflow-y: scroll;
+  height: 200px;
+  width: 100%;
+  background-color: #171717;
+  margin-top: 20px;
+
+  border-radius: 5px;
+  border: 1px solid rgb(44, 43, 43);
+}
+.show-searched-user-in-group-message::-webkit-scrollbar {
+  width: 10px;
+}
+.show-searched-user-in-group-message::-webkit-scrollbar-thumb {
+  background-color: #282828;
+  border-radius: 20px;
+}
+
+.show-spinner-classname {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

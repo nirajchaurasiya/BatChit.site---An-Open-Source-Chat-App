@@ -10,11 +10,7 @@ const Authorization = {
 }
 
 export const getAllChatCards = async () => {
-    const response = await axios.get(`${chatsBackendURL}/individual/get-chats`, {
-        headers: {
-            Authorization: `Bearer ${access_Token}`, // Set Authorization header with access token
-        },
-    })
+    const response = await axios.get(`${chatsBackendURL}/individual/get-chats`, Authorization)
     const { statusCode, data, success, code } = response.data
 
     if (statusCode === 200 && success) {
@@ -26,18 +22,24 @@ export const getAllChatCards = async () => {
 }
 
 export const addChat = async (fullName: string, _id: string) => {
-    const details = {
-        chatName: fullName,
-        isGroupChat: false,
-        receiver: _id
+    try {
+        const details = {
+            chatName: fullName,
+            isGroupChat: false,
+            receiver: _id
+        }
+        const res = await axios.post(`${chatsBackendURL}/individual/create-chat`, details, Authorization)
+
+        const { success, statusCode, data, code } = res.data
+
+        if (success && statusCode === 200) return { success, data, code }
+
+        return { success: false };
+    } catch (err: any) {
+        const { status }: { status: number } = err.response
+        console.log(err);
+        return { success: false, status }
     }
-    const res = await axios.post(`${chatsBackendURL}/individual/create-chat`, details, Authorization)
-
-    const { success, statusCode, data, code } = res.data
-
-    if (success && statusCode === 200) return { success, data, code }
-
-    return { success: false }
 }
 
 export const getAllMessagesWithId = async (chatId: string, pageNumber: Number) => {
@@ -52,15 +54,32 @@ export const getAllMessagesWithId = async (chatId: string, pageNumber: Number) =
 
 export const editMessage = async (messageId: string, content: string) => {
     try {
-        const response = await axios.put(`${chatsBackendURL}/individual/editMessage/${messageId}`, { content: content })
+        const response = await axios.put(`${chatsBackendURL}/individual/editMessage/${messageId}`, { content: content }, Authorization)
         const { statusCode, success, code, data } = response.data
+
+        const { chat, getEditedMessage } = data
         if (statusCode === 200 && success) {
-            return { success, data, code }
+            return { success, chat, getEditedMessage, code }
         }
         else {
             return { success: false }
         }
     } catch (error) {
+        return { success: false }
+    }
+}
+
+export const deleteMessage = async (message_Id: string) => {
+    const deleteMessage = await axios.delete(`${chatsBackendURL}/individual/deleteMessage/${message_Id}`, Authorization);
+
+    const { statusCode, success, data } = deleteMessage?.data
+
+    const { chat } = data
+
+    if (statusCode === 200 && success) {
+        return { success, chat }
+    }
+    else {
         return { success: false }
     }
 }

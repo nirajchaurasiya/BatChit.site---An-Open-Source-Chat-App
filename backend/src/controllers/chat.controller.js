@@ -37,7 +37,9 @@ const createIndividualChat = asyncHandler(async (req, res) => {
       });
 
       if (isChatExistsForBothUsers) {
-         throw new ApiError(409, "Chat already exists");
+         return res
+            .status(200)
+            .json(new ApiResponse(200, [], "Chats created successfully", 7005));
       }
 
       await IndividualChat.create({
@@ -533,9 +535,7 @@ const editMessage = asyncHandler(async (req, res) => {
          throw new ApiError(404, "Fields can't be empty");
       }
 
-      console.log(messageId, content);
-
-      await IndividualChatMessage?.findByIdAndUpdate(
+      const message = await IndividualChatMessage?.findByIdAndUpdate(
          messageId,
          { $set: { content: content } },
          {
@@ -602,18 +602,300 @@ const editMessage = asyncHandler(async (req, res) => {
          },
       ]);
 
+      const chats = await IndividualChat.aggregate([
+         {
+            $match: {
+               _id: new mongoose.Types.ObjectId(message?.chat),
+            },
+         },
+         {
+            $lookup: {
+               from: "users",
+               localField: "admin",
+               foreignField: "_id",
+               as: "adminUserDetails",
+               pipeline: [
+                  {
+                     $project: {
+                        _id: 1,
+                        fullName: 1,
+                        background: 1,
+                        email: 1,
+                        bio: 1,
+                     },
+                  },
+               ],
+            },
+         },
+         {
+            $addFields: {
+               adminUserDetails: {
+                  $arrayElemAt: ["$adminUserDetails", 0],
+               },
+            },
+         },
+         {
+            $lookup: {
+               from: "users",
+               localField: "receiver",
+               foreignField: "_id",
+               as: "receiverUserDetails",
+               pipeline: [
+                  {
+                     $project: {
+                        _id: 1,
+                        fullName: 1,
+                        background: 1,
+                        email: 1,
+                        bio: 1,
+                     },
+                  },
+               ],
+            },
+         },
+         {
+            $addFields: {
+               receiverUserDetails: {
+                  $arrayElemAt: ["$receiverUserDetails", 0],
+               },
+            },
+         },
+         {
+            $lookup: {
+               from: "individualchatmessages",
+               foreignField: "_id",
+               localField: "latestMessage",
+               as: "latestMessageDetails",
+               pipeline: [
+                  {
+                     $project: {
+                        _id: 1,
+                        sender: 1,
+                        content: 1,
+                        media: 1,
+                        mediaType: 1,
+                     },
+                  },
+               ],
+            },
+         },
+         {
+            $addFields: {
+               latestMessageDetails: {
+                  $arrayElemAt: ["$latestMessageDetails", 0],
+               },
+            },
+         },
+         {
+            $lookup: {
+               from: "users",
+               localField: "latestMessageDetails.sender",
+               foreignField: "_id",
+               as: "latestMessageDetails.senderDetails",
+               pipeline: [
+                  {
+                     $project: {
+                        _id: 1,
+                        fullName: 1,
+                        background: 1,
+                        email: 1,
+                        bio: 1,
+                     },
+                  },
+               ],
+            },
+         },
+         {
+            $addFields: {
+               "latestMessageDetails.senderDetails": {
+                  $arrayElemAt: ["$latestMessageDetails.senderDetails", 0],
+               },
+            },
+         },
+         {
+            $unset: ["admin", "receiver", "latestMessage"],
+         },
+      ]);
+
       return res
          .status(200)
          .json(
             new ApiResponse(
                200,
-               getEditedMessage[0],
+               { chat: chats[0], getEditedMessage: getEditedMessage[0] },
                "Message edited success",
                10001
             )
          );
    } catch (error) {
-      throw new ApiError(500, error?.message);
+      throw new ApiError(500, error?.message || "Something went wrong");
+   }
+});
+
+const deleteMessage = asyncHandler(async (req, res) => {
+   try {
+      const { messageId } = req?.params;
+      if (!messageId) {
+         throw new ApiError(
+            404,
+            "How are you suppose to delete a message without a message ID?"
+         );
+      }
+
+      const message = await IndividualChatMessage.findById(messageId);
+
+      if (!message) {
+         throw new ApiError(404, "Message doesn't exists");
+      }
+
+      await IndividualChatMessage.findByIdAndDelete(messageId);
+
+      // To update the latest message details
+
+      const chat = await IndividualChat.findById(message?.chat);
+
+      // console.log(chat);
+
+      if (!chat) {
+         throw new ApiError(400, "chat doesn't exists");
+      }
+      const latestMessage = await IndividualChatMessage.findOne({
+         chat: chat?._id,
+      })
+         .sort({ createdAt: -1 })
+         .exec();
+
+      chat.latestMessage = latestMessage?._id;
+
+      await chat?.save();
+
+      const chats = await IndividualChat.aggregate([
+         {
+            $match: {
+               _id: chat?._id,
+            },
+         },
+         {
+            $lookup: {
+               from: "users",
+               localField: "admin",
+               foreignField: "_id",
+               as: "adminUserDetails",
+               pipeline: [
+                  {
+                     $project: {
+                        _id: 1,
+                        fullName: 1,
+                        background: 1,
+                        email: 1,
+                        bio: 1,
+                     },
+                  },
+               ],
+            },
+         },
+         {
+            $addFields: {
+               adminUserDetails: {
+                  $arrayElemAt: ["$adminUserDetails", 0],
+               },
+            },
+         },
+         {
+            $lookup: {
+               from: "users",
+               localField: "receiver",
+               foreignField: "_id",
+               as: "receiverUserDetails",
+               pipeline: [
+                  {
+                     $project: {
+                        _id: 1,
+                        fullName: 1,
+                        background: 1,
+                        email: 1,
+                        bio: 1,
+                     },
+                  },
+               ],
+            },
+         },
+         {
+            $addFields: {
+               receiverUserDetails: {
+                  $arrayElemAt: ["$receiverUserDetails", 0],
+               },
+            },
+         },
+         {
+            $lookup: {
+               from: "individualchatmessages",
+               foreignField: "_id",
+               localField: "latestMessage",
+               as: "latestMessageDetails",
+               pipeline: [
+                  {
+                     $project: {
+                        _id: 1,
+                        sender: 1,
+                        content: 1,
+                        media: 1,
+                        mediaType: 1,
+                     },
+                  },
+               ],
+            },
+         },
+         {
+            $addFields: {
+               latestMessageDetails: {
+                  $arrayElemAt: ["$latestMessageDetails", 0],
+               },
+            },
+         },
+         {
+            $lookup: {
+               from: "users",
+               localField: "latestMessageDetails.sender",
+               foreignField: "_id",
+               as: "latestMessageDetails.senderDetails",
+               pipeline: [
+                  {
+                     $project: {
+                        _id: 1,
+                        fullName: 1,
+                        background: 1,
+                        email: 1,
+                        bio: 1,
+                     },
+                  },
+               ],
+            },
+         },
+         {
+            $addFields: {
+               "latestMessageDetails.senderDetails": {
+                  $arrayElemAt: ["$latestMessageDetails.senderDetails", 0],
+               },
+            },
+         },
+         {
+            $unset: ["admin", "receiver", "latestMessage"],
+         },
+      ]);
+
+      return res
+         .status(200)
+         .json(
+            new ApiResponse(
+               200,
+               { chat: chats[0] },
+               "Message deleted successfully",
+               10002
+            )
+         );
+   } catch (error) {
+      throw new ApiError(500, error?.message || "Something went wrong");
    }
 });
 
@@ -624,4 +906,5 @@ export {
    getIndividualMessages,
    getSlicedMessages,
    editMessage,
+   deleteMessage,
 };

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
    createIndividualChat,
+   deleteMessage,
    editMessage,
    getIndividualChat,
    getIndividualMessages,
@@ -28,5 +29,9 @@ router
    .get(verifyJWT, getSlicedMessages);
 
 router.route("/individual/editMessage/:messageId").put(verifyJWT, editMessage);
+
+router
+   .route("/individual/deleteMessage/:messageId")
+   .delete(verifyJWT, deleteMessage);
 
 export default router;

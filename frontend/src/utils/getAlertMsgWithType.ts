@@ -5,6 +5,7 @@ export const getAlert = (
   status: number,
   alertType: AlertMessageType
 ) => {
+  console.log(status, alertType);
   const alerttype =
     allAlertMessages
       .find((alert) => alert.type === alertType)

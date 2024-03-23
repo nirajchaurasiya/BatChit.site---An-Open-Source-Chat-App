@@ -24,11 +24,13 @@ export const messagesSlice = createSlice({
             if (messageToUpdate) {
                 (messageToUpdate as Messages).content = action.payload.content;
             }
+        },
+        removeDeletedMessage: (state, action) => {
+            state.allMessages = state.allMessages.filter((message: Messages) => message._id !== action.payload)
         }
-
     },
 });
 
-export const { saveMessages, appendMessages, appendNextMessage, saveEditedMessage } = messagesSlice.actions;
+export const { saveMessages, appendMessages, appendNextMessage, saveEditedMessage, removeDeletedMessage } = messagesSlice.actions;
 
 export default messagesSlice.reducer;

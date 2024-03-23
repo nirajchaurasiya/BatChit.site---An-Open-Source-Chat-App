@@ -17,6 +17,7 @@ import { sendEmail } from "../utils/sendEmail";
 import { AlertMessageType } from "../types/AlertTypes";
 import { AlertMessages } from "../AlertMsg/alertMsg";
 import { displayAlert } from "../utils/alertUtils";
+import SmallSpinner from "../sub-components/SmallSpinner";
 
 export default function Home({
   children,
@@ -79,7 +80,9 @@ export default function Home({
 
   const chats = useSelector((state: RootState) => state.chats.allChatCards);
 
-  const handleAddGroupChat = (e: React.FormEvent<HTMLFormElement>) => {
+  const handlerSearchUserInput = async () => {};
+
+  const handleAddGroupChat = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   };
 
@@ -656,6 +659,54 @@ export default function Home({
                     id="add-group-user"
                   />
                 </div>
+                <div className="show-searched-user-in-group-message">
+                  <div className="show-spinner-classname">Search a user</div>
+                  {/* <div className="show-spinner-classname">
+                    <SmallSpinner />
+                  </div> */}
+                  {/* <div className="search-users">
+                    <a
+                      className="search-user-card"
+                      href="/search?query=65d2d7e396d4799c52faa4f0"
+                      style={{ color: "white" }}
+                    >
+                      <div className="search-profile">
+                        <p>N</p>
+                      </div>
+                      <div className="card-user-desc">
+                        <p>Niraj Chaurasiya</p>
+                        <p>nirajkumarchaurasiya6@gmail.com</p>
+                      </div>
+                    </a>
+                    <a
+                      className="search-user-card"
+                      href="/search?query=65e0885a3e1148639509a526"
+                      style={{ color: "white" }}
+                    >
+                      <div className="search-profile">
+                        <p>D</p>
+                      </div>
+                      <div className="card-user-desc">
+                        <p>Dev Niraj</p>
+                        <p>Hey there.</p>
+                      </div>
+                    </a>
+                    <a
+                      className="search-user-card"
+                      href="/search?query=65ea7ff4fc92ec8499bab840"
+                      style={{ color: "white" }}
+                    >
+                      <div className="search-profile">
+                        <p>N</p>
+                      </div>
+                      <div className="card-user-desc">
+                        <p>Niraj Chaurasiya</p>
+                        <p>Hey there!</p>
+                      </div>
+                    </a>
+                  </div> */}
+                </div>
+
                 <div className="add-btn-control">
                   <button type="submit">Add Chat</button>
                 </div>

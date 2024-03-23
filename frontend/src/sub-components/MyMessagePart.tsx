@@ -7,9 +7,11 @@ import { IoCheckmarkDone } from "react-icons/io5";
 export default function MyMessagePart({
   message,
   handleClickMessage,
+  handleMessageDeletion,
 }: {
   message: Messages;
   handleClickMessage: (messageId: string) => void;
+  handleMessageDeletion: (messageId: string) => void;
 }) {
   const [media, setMedia] = useState<string | undefined>(undefined);
   const [scaleFactor, setScaleFactor] = useState<number>(1.0);
@@ -41,6 +43,7 @@ export default function MyMessagePart({
       document.removeEventListener("wheel", handleScroll);
     };
   }, [scaleFactor]);
+
   return (
     <>
       <div className="user_conversation_container">
@@ -70,23 +73,6 @@ export default function MyMessagePart({
                     )}
                   </div>
                 )}
-                <div className="dropdown">
-                  <button className="dropbtn">
-                    <p>
-                      <IoIosArrowDown />
-                    </p>
-                  </button>
-                  <div className="dropdown-content">
-                    <p
-                      onClick={() => {
-                        handleClickMessage(message?._id);
-                      }}
-                    >
-                      Edit
-                    </p>
-                    <p>Delete</p>
-                  </div>
-                </div>
               </div>
             ) : (
               <>
@@ -96,15 +82,47 @@ export default function MyMessagePart({
                       <IoIosArrowDown />
                     </p>
                   </button>
+
                   <div className="dropdown-content">
-                    <p
-                      onClick={() => {
-                        handleClickMessage(message?._id);
-                      }}
-                    >
-                      Edit
-                    </p>
-                    <p>Delete</p>
+                    {message?.createdAt ? (
+                      new Date().getTime() -
+                        new Date(message.createdAt).getTime() >
+                      3600000 ? (
+                        <p
+                          onClick={async () => {
+                            await navigator.clipboard.writeText(
+                              message?.content
+                            );
+                          }}
+                        >
+                          Copy
+                        </p>
+                      ) : (
+                        <>
+                          <p
+                            onClick={() => {
+                              handleClickMessage(message?._id);
+                            }}
+                          >
+                            Edit
+                          </p>
+                          <p
+                            onClick={() => handleMessageDeletion(message?._id)}
+                          >
+                            Delete
+                          </p>
+                          <p
+                            onClick={async () => {
+                              await navigator.clipboard.writeText(
+                                message?.content
+                              );
+                            }}
+                          >
+                            Copy
+                          </p>
+                        </>
+                      )
+                    ) : null}
                   </div>
                 </div>
                 <p className="message-value">{message?.content}</p>

@@ -21,9 +21,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../types/Rootstate";
 import { formatDateForInitialChatCreationAlert } from "../utils/messageDateFormat";
 import { Socket } from "socket.io-client";
-import { editMessage, getAllMessagesWithId } from "../apis/chatActions";
+import {
+  deleteMessage,
+  editMessage,
+  getAllMessagesWithId,
+} from "../apis/chatActions";
 import {
   appendMessages,
+  removeDeletedMessage,
   saveEditedMessage,
   saveMessages,
 } from "../features/messages/messageSlice";
@@ -31,6 +36,7 @@ import { sendFileToServer } from "../utils/sendFileToServer";
 import { useDropzone } from "react-dropzone";
 import InfiniteScroll from "react-infinite-scroll-component";
 import SmallSpinner from "../sub-components/SmallSpinner";
+import { editChat } from "../features/chat/chatSlice";
 export default function SingleMessage({ socket }: { socket: Socket | null }) {
   const [file, setFile] = useState<File | null>(null);
   const [typingAlertText, setTypingAlertText] = useState("");
@@ -192,55 +198,7 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
   };
 
   // Function to initiate audio call
-  const handleAudioCall = async () => {
-    try {
-      // Get user's media devices (microphone)
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-      // Initialize peer connection
-      const peerConnection = new RTCPeerConnection();
-
-      // Add the user's media stream to the peer connection
-      stream
-        .getTracks()
-        .forEach((track) => peerConnection.addTrack(track, stream));
-
-      // Create an offer to start the call
-      const offer = await peerConnection.createOffer();
-      await peerConnection.setLocalDescription(offer);
-
-      // Send the offer to the other user through your signaling server
-      // For simplicity, let's assume you have a socket connection
-      socket?.emit("audio-call-offer", { offer });
-
-      // Handle incoming answer from the other user
-      socket?.on("audio-call-answer", async (data: any) => {
-        const { answer } = data;
-        await peerConnection.setRemoteDescription(answer);
-      });
-
-      // Handle ICE candidate events to establish connectivity
-      peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
-          // Send ICE candidate to the other user through your signaling server
-          socket?.emit("ice-candidate", { candidate: event.candidate });
-        }
-      };
-
-      // Event listeners to handle incoming ICE candidates
-      socket?.on("ice-candidate", (data: any) => {
-        const { candidate } = data;
-        peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-      });
-
-      // Event listener to handle closing the call
-      socket?.on("close-audio-call", () => {
-        peerConnection.close();
-      });
-    } catch (error) {
-      console.error("Error initiating audio call:", error);
-    }
-  };
+  const handleAudioCall = async () => {};
   const fetchMoreData = async () => {
     if (chatId) {
       const nextPageNumber = pageNumber + 1;
@@ -271,9 +229,24 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
   const editMessageAction = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const response = await editMessage(messageIdToEdit, messageValue);
-    const { success, data } = response;
+    const { success, chat, getEditedMessage } = response;
     if (success) {
-      dispatch(saveEditedMessage(data));
+      dispatch(saveEditedMessage(getEditedMessage));
+      dispatch(editChat(chat));
+    }
+    setMessageIdToEdit("");
+    setMessageValue("");
+  };
+
+  const handleMessageDeletion = async (messageId: string) => {
+    const findMessage = messages?.find((field) => field._id === messageId);
+    if (findMessage && messageId) {
+      const response = await deleteMessage(messageId);
+      const { success, chat } = response;
+      if (success) {
+        dispatch(removeDeletedMessage(messageId));
+        dispatch(editChat(chat));
+      }
     }
   };
 
@@ -341,6 +314,7 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
                       <MyMessagePart
                         handleClickMessage={handleEditMessage}
                         message={message}
+                        handleMessageDeletion={handleMessageDeletion}
                       />
                     ) : (
                       <OtherPersonMessagePart message={message} />

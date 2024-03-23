@@ -70,6 +70,9 @@ export const allAlertMessages = [
       },
       {
         code: 7004, msg: 'Unauthorized request', statusCode: 400
+      },
+      {
+        code: 7005, msg: 'Chat already exists', statusCode: 209
       }
     ]
   }
