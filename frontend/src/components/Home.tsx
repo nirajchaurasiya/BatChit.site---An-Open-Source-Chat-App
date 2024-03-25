@@ -44,6 +44,7 @@ export default function Home({
   const showProfileOptions = useContext(ToggleProfile);
   const [initialStateForSearchUserField, setInitialStateForSearchUserField] =
     useState<JSX.Element | string>("Search a user");
+  const [isApiLoading, setIsApiLoading] = useState(false);
   const [addedUser, setAddedUser] = useState<SearchUser[] | []>([]);
   const searchUserOptions = useContext(SearchUserContext);
   if (!searchUserOptions) return null;
@@ -100,6 +101,7 @@ export default function Home({
       if (success) {
         setSearchUser(data);
         setInitialStateForSearchUserField("Search a user");
+        setIsApiLoading(false);
       }
     } else {
       setSearchUser([]);
@@ -108,6 +110,7 @@ export default function Home({
 
   const handlerSearchUserInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
+    setIsApiLoading(true);
     delayedApiCall(inputValue);
   };
 
@@ -702,7 +705,7 @@ export default function Home({
                     id="add-group-user"
                   />
                 </div>
-                {searchUser.length > 0 && (
+                {(searchUser.length > 0 || isApiLoading) && (
                   <div className="show-searched-user-in-group-message">
                     {searchUser.length === 0 ? (
                       <div className="show-spinner-classname">
