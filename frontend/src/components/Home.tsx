@@ -351,7 +351,7 @@ export default function Home({
           {groupMessages && (
             <div
               className={`${
-                message && showProfile
+                (groupMessages && showProfile) || (message && showProfile)
                   ? "all-users-container"
                   : "no-home-all-users-container"
               }`}
@@ -565,7 +565,7 @@ export default function Home({
           {/* Show Message container */}
           <div
             className={`${
-              message && showProfile
+              (groupMessages && showProfile) || (message && showProfile)
                 ? "show-message-container"
                 : "no-home-show-message-container"
             } ${
@@ -605,7 +605,7 @@ export default function Home({
             (groupMessages && isGroup && showProfile)) && (
             <div
               className={`${
-                message && showProfile
+                (groupMessages && showProfile) || (message && showProfile)
                   ? "rightbar-profile-container"
                   : "no-home-rightbar-profile-container"
               }`}

@@ -43,7 +43,7 @@ export default function GroupMessageList({ data }: GroupMessageCardType) {
             </p>
           )}
           <div className="user-name-msg">
-            <p>Sample Name Card</p>
+            <p>{data?.chatName}</p>
             <p>
               {data?.latestMessageDetails?._id
                 ? `${
