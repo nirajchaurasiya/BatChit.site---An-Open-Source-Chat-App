@@ -73,6 +73,13 @@ export const allAlertMessages = [
       },
       {
         code: 7005, msg: 'Chat already exists', statusCode: 209
+      },
+      // Group chat
+      {
+        code: 7006, msg: 'Group created', statusCode: 200,
+      },
+      {
+        code: 7007, msg: 'Group chats retrieved', statusCode: 200,
       }
     ]
   }

@@ -11,7 +11,6 @@ interface UserDetails {
 
 interface LatestMessageDetails {
   _id: string;
-  sender: string;
   content: string;
   senderDetails: UserDetails;
   media: string;
@@ -31,6 +30,28 @@ export type IndividualChatDetails = [{
   isSeen: Boolean
 }]
 
+interface CommonGroupDetails {
+  _id: string;
+  chatName: string;
+  isGroupChat: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  __v: number;
+  adminUserDetails: UserDetails;
+  receiverUsersDetails: UserDetails[];
+  latestMessageDetails: LatestMessageDetails;
+}
+
+export type GroupMessageCardType = {
+  data: CommonGroupDetails;
+};
+
+export type GroupChatDetails = [
+  CommonGroupDetails & {
+    isSeen: Boolean;
+    readBy: string[]
+  }
+];
 
 interface ChatDetails {
   _id: string;
@@ -75,11 +96,10 @@ export type MessageCardType = {
     createdAt: Date;
     updatedAt: Date;
     __v: number;
-
     adminUserDetails: UserDetails;
     receiverUserDetails: UserDetails;
     latestMessageDetails: LatestMessageDetails;
-  }
+  },
 };
 
 export type HomeParams = LayoutParamsType & {
@@ -110,6 +130,7 @@ export type SearchUserType = [
     email: string
   }
 ];
+
 export type GroupedUserType = {
   _id: string;
   fullName: string;

@@ -1,8 +1,10 @@
 import { Router } from "express";
 import {
+   createGroupChat,
    createIndividualChat,
    deleteMessage,
    editMessage,
+   getGroupChats,
    getIndividualChat,
    getIndividualMessages,
    getSlicedMessages,
@@ -28,10 +30,16 @@ router
    .route("/individual/get-sliced-messages/:chatId/:page")
    .get(verifyJWT, getSlicedMessages);
 
-router.route("/individual/editMessage/:messageId").put(verifyJWT, editMessage);
+// Common routes
 
-router
-   .route("/individual/deleteMessage/:messageId")
-   .delete(verifyJWT, deleteMessage);
+router.route("/editMessage/:messageId").put(verifyJWT, editMessage);
+
+router.route("/deleteMessage/:messageId").delete(verifyJWT, deleteMessage);
+
+// Group chat
+
+router.route("/group/create-chat").post(verifyJWT, createGroupChat);
+
+router.route("/group/get-chats").get(verifyJWT, getGroupChats);
 
 export default router;

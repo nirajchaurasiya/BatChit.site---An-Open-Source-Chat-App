@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import path from "path";
 import { fileURLToPath } from "url";
 import { sendEmail } from "../utils/sendEmail.js";
+import mongoose from "mongoose";
 // await sendEmail("account_activation", email, activateToken);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -390,16 +391,20 @@ const checkActivationEmail = asyncHandler(async (req, res) => {
 
 const searchUser = asyncHandler(async (req, res) => {
    const { query } = req.params;
+   const adminId = req?.user?._id;
 
-   if (query?.trim() === "") {
+   if (!adminId) throw new ApiError(404, "Unauthorized request");
+
+   if (!query?.trim()) {
       throw new ApiError(404, "Enter a query to search");
    }
 
-   const keywords = query?.trim()?.toLowerCase().split(/\s+/); // Convert search query to lowercase
+   const keywords = query.trim().toLowerCase().split(/\s+/); // Convert search query to lowercase
 
    const result = await User.aggregate([
       {
          $match: {
+            _id: { $ne: new mongoose.Types.ObjectId(adminId) }, // Exclude adminId
             $or: [
                {
                   fullName: {

@@ -3,15 +3,15 @@ import Linkscontainer from "./Linkscontainer";
 import MessageCard from "./MessageCard";
 import { BiSolidDislike, BiSolidLock } from "react-icons/bi";
 import { GroupedMemberType, HomeParams } from "../types/Types";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ToggleProfile } from "../context/ToggleProfile";
 import { ImCross } from "react-icons/im";
 import { MdBlock, MdDelete, MdVerified } from "react-icons/md";
 import SearchComponent from "./SearchComponent";
 import { SearchUser, SearchUserContext } from "../context/searchedContext";
 import UserProfile from "./UserProfile";
-import { useNavigate, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../types/Rootstate";
 import { sendEmail } from "../utils/sendEmail";
 import { AlertMessageType } from "../types/AlertTypes";
@@ -20,6 +20,13 @@ import { displayAlert } from "../utils/alertUtils";
 import SmallSpinner from "../sub-components/SmallSpinner";
 import { getSearchedResult } from "../apis/getSearchedResult";
 import { FaMinus, FaPlus } from "react-icons/fa";
+import GroupMessageList from "./GroupMessageList";
+import { createGroupChat, getGroupChats } from "../apis/chatActions";
+import {
+  appendGroupChat,
+  saveGroupChatCards,
+} from "../features/chat/chatSlice";
+import { Dispatch } from "@reduxjs/toolkit";
 
 export default function Home({
   children,
@@ -38,6 +45,7 @@ export default function Home({
     "Send activation link"
   );
   const [showAlert, setShowAlert] = useState(false);
+  const [chatName, setChatName] = useState("");
   const [code, setCode] = useState(3001);
   const [msgType, setMsgType] = useState<AlertMessageType>("email");
   const [addGroupChat, setAddGroupChat] = useState(false);
@@ -85,6 +93,14 @@ export default function Home({
 
   const chats = useSelector((state: RootState) => state.chats.allChatCards);
 
+  const dispatch = useDispatch<Dispatch>();
+
+  const groupChats = useSelector(
+    (state: RootState) => state.chats.allGroupChatCards
+  );
+
+  const location = useLocation();
+
   const debounce = (func: Function, delay: number) => {
     let timer: NodeJS.Timeout;
     return function (this: any, ...args: any[]) {
@@ -116,6 +132,17 @@ export default function Home({
 
   const handleAddGroupChat = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const userIds = addedUser?.map((e) => e._id);
+
+    const response = await createGroupChat(chatName, userIds);
+
+    const { success, data, code } = response;
+
+    if (success) {
+      displayAlert(setShowAlert, setCode, setMsgType, code, "chatCards");
+      dispatch(appendGroupChat(data));
+      setAddGroupChat(false);
+    }
   };
 
   const addTheUser = (user: SearchUser) => {
@@ -131,6 +158,23 @@ export default function Home({
       setAddedUser((prevUser) => prevUser.filter((e) => e._id !== user?._id));
     }
   };
+
+  useEffect(() => {
+    const fetchGroupChats = async () => {
+      if (location.pathname === "/group-messages" && groupChats.length < 1) {
+        const response = await getGroupChats();
+
+        const { success, code, data } = response;
+
+        if (success) {
+          displayAlert(setShowAlert, setCode, setMsgType, code, "chatCards");
+          dispatch(saveGroupChatCards(data));
+        }
+      }
+    };
+    fetchGroupChats();
+  }, [location.pathname]);
+
   return (
     <>
       <section className="home-container">
@@ -335,10 +379,10 @@ export default function Home({
               </div>
               <div className="card-messages">
                 {loggedInUser.isActivated ? (
-                  chatsCard.filter((chat) => chat.isGroupChat).length > 0 ? (
-                    chatsCard
-                      .filter((chat) => chat.isGroupChat)
-                      .map((card) => <MessageCard key={card._id} data={card} />)
+                  groupChats.length > 0 ? (
+                    groupChats.map((card) => (
+                      <GroupMessageList key={card._id} data={card} />
+                    ))
                   ) : (
                     <div
                       style={{
@@ -520,13 +564,14 @@ export default function Home({
 
           {/* Show Message container */}
           <div
-            style={isGroup ? { width: "60%" } : {}}
             className={`${
-              isGroup || (message && showProfile)
+              message && showProfile
                 ? "show-message-container"
                 : "no-home-show-message-container"
             } ${
-              (userId || chatId) && widthOfWindow && widthOfWindow < 575
+              (userId || chatId || isGroup) &&
+              widthOfWindow &&
+              widthOfWindow < 575
                 ? " rightbar-message-fixed "
                 : ""
             }`}
@@ -556,7 +601,8 @@ export default function Home({
 
           {/* profile-container */}
 
-          {message && showProfile && (
+          {((message && showProfile) ||
+            (groupMessages && isGroup && showProfile)) && (
             <div
               className={`${
                 message && showProfile
@@ -694,6 +740,10 @@ export default function Home({
                     placeholder="Name of your group"
                     type="text"
                     id="group-name"
+                    onChange={(e) => {
+                      setChatName(e.target.value);
+                    }}
+                    value={chatName}
                   />
                 </div>
                 <div className="input">

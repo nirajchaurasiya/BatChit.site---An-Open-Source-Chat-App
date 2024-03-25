@@ -54,7 +54,7 @@ export const getAllMessagesWithId = async (chatId: string, pageNumber: Number) =
 
 export const editMessage = async (messageId: string, content: string) => {
     try {
-        const response = await axios.put(`${chatsBackendURL}/individual/editMessage/${messageId}`, { content: content }, Authorization)
+        const response = await axios.put(`${chatsBackendURL}/editMessage/${messageId}`, { content: content }, Authorization)
         const { statusCode, success, code, data } = response.data
 
         const { chat, getEditedMessage } = data
@@ -70,7 +70,7 @@ export const editMessage = async (messageId: string, content: string) => {
 }
 
 export const deleteMessage = async (message_Id: string) => {
-    const deleteMessage = await axios.delete(`${chatsBackendURL}/individual/deleteMessage/${message_Id}`, Authorization);
+    const deleteMessage = await axios.delete(`${chatsBackendURL}/deleteMessage/${message_Id}`, Authorization);
 
     const { statusCode, success, data } = deleteMessage?.data
 
@@ -78,6 +78,33 @@ export const deleteMessage = async (message_Id: string) => {
 
     if (statusCode === 200 && success) {
         return { success, chat }
+    }
+    else {
+        return { success: false }
+    }
+}
+
+// Group Chat in process
+
+export const createGroupChat = async (chatName: string, users: string[]) => {
+    const response = await axios.post(`${chatsBackendURL}/group/create-chat`, {
+        chatName, users
+    }, Authorization);
+
+    const { statusCode, success, data, code } = response?.data;
+    if (statusCode === 200 && success) {
+        return { success, data, code }
+    }
+    else {
+        return { success: false }
+    }
+}
+
+export const getGroupChats = async () => {
+    const response = await axios.get(`${chatsBackendURL}/group/get-chats`, Authorization)
+    const { success, statusCode, data, code } = response.data
+    if (success && statusCode === 200) {
+        return { success, code, data }
     }
     else {
         return { success: false }

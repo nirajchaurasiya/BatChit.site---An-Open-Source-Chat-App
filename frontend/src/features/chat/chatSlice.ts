@@ -1,11 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { IndividualChatDetails } from "../../types/Types";
-// import { Chat } from "../../types/Types";
 
 export const chatCardsSlice = createSlice({
     name: "chatCards",
     initialState: {
         allChatCards: [],
+        allGroupChatCards: []
     },
     reducers: {
         saveChatCards: (state, action) => {
@@ -16,10 +16,18 @@ export const chatCardsSlice = createSlice({
             if (findChat) {
                 (findChat as IndividualChatDetails[0]).latestMessageDetails.content = action.payload.latestMessageDetails.content;
             }
+        },
+        // Group Chat
+
+        saveGroupChatCards: (state, action) => {
+            state.allGroupChatCards = action.payload;
+        },
+        appendGroupChat: (state: any, action) => {
+            state.allGroupChatCards = [...state.allGroupChatCards, action.payload];
         }
     },
 });
 
-export const { saveChatCards, editChat } = chatCardsSlice.actions;
+export const { saveChatCards, editChat, saveGroupChatCards, appendGroupChat } = chatCardsSlice.actions;
 
 export default chatCardsSlice.reducer;

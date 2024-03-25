@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { IndividualChat } from "../models/individualChat.model.js";
 import mongoose from "mongoose";
 import { IndividualChatMessage } from "../models/individualChatMessage.model.js";
+import { GroupChat } from "../models/groupChat.model.js";
 
 const createIndividualChat = asyncHandler(async (req, res) => {
    try {
@@ -899,6 +900,168 @@ const deleteMessage = asyncHandler(async (req, res) => {
    }
 });
 
+// Group chat in process
+
+const createGroupChat = asyncHandler(async (req, res) => {
+   try {
+      const { chatName, users } = req.body;
+
+      const adminId = req?.user?._id;
+
+      if (!chatName) throw new ApiError(404, "Chatname is empty");
+
+      if (!adminId) throw new ApiError(400, "Unauthorized request");
+
+      if (Array.isArray(users).length > 0)
+         throw new ApiError(405, "There must be a receiver");
+
+      const chat = await GroupChat.create({
+         admin: adminId,
+         chatName: chatName,
+         latestMessage: new mongoose.Types.ObjectId(),
+         users: [...users, adminId],
+      });
+
+      // To check if it is created successfully
+
+      const check_chat = await GroupChat.findById(chat?._id);
+
+      if (!check_chat)
+         throw new ApiError(
+            409,
+            "Something went wrong while creating the group chat"
+         );
+
+      return res
+         .status(200)
+         .json(new ApiResponse(200, chat, "Group created", 7006));
+   } catch (error) {
+      throw new ApiError(500, "Something went wrong");
+   }
+});
+
+const getGroupChats = asyncHandler(async (req, res) => {
+   const adminId = req?.user?._id;
+
+   if (!adminId) throw new ApiError(404, "Unatuhorized request");
+
+   const chats = await GroupChat.aggregate([
+      {
+         $match: {
+            $or: [
+               {
+                  admin: new mongoose.Types.ObjectId(adminId),
+               },
+               {
+                  users: new mongoose.Types.ObjectId(adminId),
+               },
+            ],
+         },
+      },
+      {
+         $lookup: {
+            from: "users",
+            localField: "admin",
+            foreignField: "_id",
+            as: "adminUserDetails",
+            pipeline: [
+               {
+                  $project: {
+                     _id: 1,
+                     fullName: 1,
+                     background: 1,
+                  },
+               },
+            ],
+         },
+      },
+      {
+         $addFields: {
+            adminUserDetails: {
+               $arrayElemAt: ["$adminUserDetails", 0],
+            },
+         },
+      },
+      {
+         $lookup: {
+            from: "users",
+            localField: "users",
+            foreignField: "_id",
+            as: "receiverUsersDetails",
+            pipeline: [
+               {
+                  $project: {
+                     _id: 1,
+                     fullName: 1,
+                     background: 1,
+                  },
+               },
+            ],
+         },
+      },
+
+      {
+         $lookup: {
+            from: "groupchatmessages",
+            foreignField: "_id",
+            localField: "latestMessage",
+            as: "latestMessageDetails",
+            pipeline: [
+               {
+                  $project: {
+                     _id: 1,
+                     sender: 1,
+                     content: 1,
+                     media: 1,
+                     mediaType: 1,
+                  },
+               },
+            ],
+         },
+      },
+      {
+         $addFields: {
+            latestMessageDetails: {
+               $arrayElemAt: ["$latestMessageDetails", 0],
+            },
+         },
+      },
+      {
+         $lookup: {
+            from: "users",
+            localField: "latestMessageDetails.sender",
+            foreignField: "_id",
+            as: "latestMessageDetails.senderDetails",
+            pipeline: [
+               {
+                  $project: {
+                     _id: 1,
+                     fullName: 1,
+                     background: 1,
+                     email: 1,
+                     bio: 1,
+                  },
+               },
+            ],
+         },
+      },
+      {
+         $addFields: {
+            "latestMessageDetails.senderDetails": {
+               $arrayElemAt: ["$latestMessageDetails.senderDetails", 0],
+            },
+         },
+      },
+      {
+         $unset: ["admin", "users", "latestMessage"],
+      },
+   ]);
+
+   return res
+      .status(200)
+      .json(new ApiResponse(200, chats, "Group chats fetched success", 7007));
+});
+
 export {
    createIndividualChat,
    getIndividualChat,
@@ -907,4 +1070,7 @@ export {
    getSlicedMessages,
    editMessage,
    deleteMessage,
+   // Group chat
+   createGroupChat,
+   getGroupChats,
 };

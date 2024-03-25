@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import BlockedAccount from "../components/BlockedAccount";
 import DeleteAccount from "../components/DeleteAccount";
 import Home from "../components/Home";
-import Profile from "../components/Profile";
 import SelectaMessage from "../components/SelectaMessage";
 import SingleMessage from "../components/SingleMessage";
 import UserInformation from "../components/UserInformation";
@@ -16,6 +15,7 @@ import { displayAlert } from "../utils/alertUtils";
 import { AlertMessages } from "../AlertMsg/alertMsg";
 import { AlertMessageType } from "../types/AlertTypes";
 import { saveChatCards } from "../features/chat/chatSlice";
+import GroupSingleMessage from "../components/GroupSingleMessage";
 
 export default function Layout({
   home,
@@ -129,7 +129,7 @@ export default function Layout({
             <p>Search an user to view</p>
           </div>
         )}
-        {groupMessages && isGroup && <Profile isGroup={isGroup} />}
+        {groupMessages && isGroup && <GroupSingleMessage socket={socket} />}
         {groupMessages && widthOfWindow > 575 && !isGroup && (
           <div
             style={{
