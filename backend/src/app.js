@@ -23,6 +23,7 @@ import chatRouter from "./routes/chat.routes.js";
 
 import { typingHandler } from "./socketFunctions/typingHandler.js";
 import { sendIndividualMessageHandler } from "./socketFunctions/sendIndividualMessageHandler.js";
+import { sendIndividualChatNotificationsHandler } from "./socketFunctions/sendIndividualChatNotificationsHandler.js";
 //routes declaration
 app.use("/api/v1/users", userRouter);
 
@@ -39,6 +40,10 @@ io.on("connection", async (socket) => {
    socket.on("send-individual-message", sendIndividualMessageHandler);
 
    socket.on("typing", typingHandler());
+
+   // send notifications to all user when a chat is created
+
+   socket.on("making-individual-chat", sendIndividualChatNotificationsHandler);
 
    socket.on("disconnect", () => {
       console.log("User disconnected");

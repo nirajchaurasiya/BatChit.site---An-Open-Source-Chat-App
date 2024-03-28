@@ -915,7 +915,7 @@ const createGroupChat = asyncHandler(async (req, res) => {
       if (Array.isArray(users).length > 0)
          throw new ApiError(405, "There must be a receiver");
 
-      const chat = await GroupChat.create({
+      const created_chat = await GroupChat.create({
          admin: adminId,
          chatName: chatName,
          latestMessage: new mongoose.Types.ObjectId(),
@@ -924,17 +924,121 @@ const createGroupChat = asyncHandler(async (req, res) => {
 
       // To check if it is created successfully
 
-      const check_chat = await GroupChat.findById(chat?._id);
+      const check_chat = await GroupChat.findById(created_chat?._id);
 
       if (!check_chat)
          throw new ApiError(
             409,
             "Something went wrong while creating the group chat"
          );
+      const chat = await GroupChat.aggregate([
+         {
+            $match: {
+               _id: new mongoose.Types.ObjectId(created_chat?._id),
+            },
+         },
+         {
+            $lookup: {
+               from: "users",
+               localField: "admin",
+               foreignField: "_id",
+               as: "adminUserDetails",
+               pipeline: [
+                  {
+                     $project: {
+                        _id: 1,
+                        fullName: 1,
+                        background: 1,
+                     },
+                  },
+               ],
+            },
+         },
+         {
+            $addFields: {
+               adminUserDetails: {
+                  $arrayElemAt: ["$adminUserDetails", 0],
+               },
+            },
+         },
+         {
+            $lookup: {
+               from: "users",
+               localField: "users",
+               foreignField: "_id",
+               as: "receiverUsersDetails",
+               pipeline: [
+                  {
+                     $project: {
+                        _id: 1,
+                        fullName: 1,
+                        background: 1,
+                     },
+                  },
+               ],
+            },
+         },
+
+         {
+            $lookup: {
+               from: "groupchatmessages",
+               foreignField: "_id",
+               localField: "latestMessage",
+               as: "latestMessageDetails",
+               pipeline: [
+                  {
+                     $project: {
+                        _id: 1,
+                        sender: 1,
+                        content: 1,
+                        media: 1,
+                        mediaType: 1,
+                     },
+                  },
+               ],
+            },
+         },
+         {
+            $addFields: {
+               latestMessageDetails: {
+                  $arrayElemAt: ["$latestMessageDetails", 0],
+               },
+            },
+         },
+         {
+            $lookup: {
+               from: "users",
+               localField: "latestMessageDetails.sender",
+               foreignField: "_id",
+               as: "latestMessageDetails.senderDetails",
+               pipeline: [
+                  {
+                     $project: {
+                        _id: 1,
+                        fullName: 1,
+                        background: 1,
+                        email: 1,
+                        bio: 1,
+                     },
+                  },
+               ],
+            },
+         },
+         {
+            $addFields: {
+               "latestMessageDetails.senderDetails": {
+                  $arrayElemAt: ["$latestMessageDetails.senderDetails", 0],
+               },
+            },
+         },
+         {
+            $unset: ["admin", "users", "latestMessage"],
+         },
+      ]);
 
       return res
          .status(200)
-         .json(new ApiResponse(200, chat, "Group created", 7006));
+         .json(new ApiResponse(200, chat[0], "Group created", 7006));
    } catch (error) {
       throw new ApiError(500, "Something went wrong");
    }
@@ -1062,6 +1166,127 @@ const getGroupChats = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, chats, "Group chats fetched success", 7007));
 });
 
+const getGroupChatWithId = asyncHandler(async (req, res) => {
+   const { chatId } = req?.params;
+
+   if (!chatId) {
+      throw new ApiError(404, "How can you suppose to get chat without an Id?");
+   }
+
+   const chat = await GroupChat.aggregate([
+      {
+         $match: {
+            _id: new mongoose.Types.ObjectId(chatId),
+         },
+      },
+      {
+         $lookup: {
+            from: "users",
+            localField: "admin",
+            foreignField: "_id",
+            as: "adminUserDetails",
+            pipeline: [
+               {
+                  $project: {
+                     _id: 1,
+                     fullName: 1,
+                     background: 1,
+                     bio: 1,
+                     email: 1,
+                  },
+               },
+            ],
+         },
+      },
+      {
+         $addFields: {
+            adminUserDetails: {
+               $arrayElemAt: ["$adminUserDetails", 0],
+            },
+         },
+      },
+      {
+         $lookup: {
+            from: "users",
+            localField: "users",
+            foreignField: "_id",
+            as: "receiverUsersDetails",
+            pipeline: [
+               {
+                  $project: {
+                     _id: 1,
+                     fullName: 1,
+                     background: 1,
+                     bio: 1,
+                     email: 1,
+                  },
+               },
+            ],
+         },
+      },
+
+      {
+         $lookup: {
+            from: "groupchatmessages",
+            foreignField: "_id",
+            localField: "latestMessage",
+            as: "latestMessageDetails",
+            pipeline: [
+               {
+                  $project: {
+                     _id: 1,
+                     sender: 1,
+                     content: 1,
+                     media: 1,
+                     mediaType: 1,
+                  },
+               },
+            ],
+         },
+      },
+      {
+         $addFields: {
+            latestMessageDetails: {
+               $arrayElemAt: ["$latestMessageDetails", 0],
+            },
+         },
+      },
+      {
+         $lookup: {
+            from: "users",
+            localField: "latestMessageDetails.sender",
+            foreignField: "_id",
+            as: "latestMessageDetails.senderDetails",
+            pipeline: [
+               {
+                  $project: {
+                     _id: 1,
+                     fullName: 1,
+                     background: 1,
+                     email: 1,
+                     bio: 1,
+                  },
+               },
+            ],
+         },
+      },
+      {
+         $addFields: {
+            "latestMessageDetails.senderDetails": {
+               $arrayElemAt: ["$latestMessageDetails.senderDetails", 0],
+            },
+         },
+      },
+      {
+         $unset: ["admin", "users", "latestMessage"],
+      },
+   ]);
+
+   return res
+      .status(200)
+      .json(new ApiResponse(200, chat[0], "chat fetched success", 8001));
+});
+
 export {
    createIndividualChat,
    getIndividualChat,
@@ -1073,4 +1298,5 @@ export {
    // Group chat
    createGroupChat,
    getGroupChats,
+   getGroupChatWithId,
 };

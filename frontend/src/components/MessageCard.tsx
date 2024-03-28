@@ -29,19 +29,13 @@ export default function MessageCard({ data }: MessageCardType) {
     >
       <div className={`card-message`}>
         <div className="card-profile">
-          {data.isGroupChat ? (
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNLj_8pzpibGhDNjYNR_GccHZZ5ITc656d5g&usqp=CAU"
-              alt="user-pic"
-            />
-          ) : (
-            <p
-              className="text-bg"
-              style={{ backgroundColor: data?.adminUserDetails?.background }}
-            >
-              {data?.chatName?.slice(0, 1)}
-            </p>
-          )}
+          <p
+            className="text-bg"
+            style={{ backgroundColor: data?.adminUserDetails?.background }}
+          >
+            {data?.chatName?.slice(0, 1)}
+          </p>
+
           <div className="user-name-msg">
             <p>
               {data.adminUserDetails?._id === loggedInUser?._id

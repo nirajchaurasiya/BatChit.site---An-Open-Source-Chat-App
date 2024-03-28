@@ -27,6 +27,7 @@ import {
   saveGroupChatCards,
 } from "../features/chat/chatSlice";
 import { Dispatch } from "@reduxjs/toolkit";
+import Profile from "./Profile";
 
 export default function Home({
   children,
@@ -61,7 +62,6 @@ export default function Home({
   if (!showProfileOptions) {
     return null;
   }
-
   const loggedInUser = useSelector(
     (state: RootState) => state.auth.loggedInUser
   );
@@ -601,8 +601,7 @@ export default function Home({
 
           {/* profile-container */}
 
-          {((message && showProfile) ||
-            (groupMessages && isGroup && showProfile)) && (
+          {message && showProfile && (
             <div
               className={`${
                 (groupMessages && showProfile) || (message && showProfile)
@@ -715,6 +714,7 @@ export default function Home({
               </div>
             </div>
           )}
+          {groupMessages && isGroup && showProfile && <Profile />}
         </div>
 
         {addGroupChat && (

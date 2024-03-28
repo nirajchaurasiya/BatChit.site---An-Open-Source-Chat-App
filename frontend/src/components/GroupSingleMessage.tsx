@@ -37,6 +37,7 @@ import { useDropzone } from "react-dropzone";
 import InfiniteScroll from "react-infinite-scroll-component";
 import SmallSpinner from "../sub-components/SmallSpinner";
 import { editChat } from "../features/chat/chatSlice";
+import { CgMenuGridR } from "react-icons/cg";
 export default function GroupSingleMessage({
   socket,
 }: {
@@ -289,6 +290,7 @@ export default function GroupSingleMessage({
           <div className="call-icons">
             <IoCall onClick={handleAudioCall} />
             <IoVideocam />
+            <CgMenuGridR />
           </div>
         </div>
 
@@ -312,7 +314,7 @@ export default function GroupSingleMessage({
             <div ref={messageContainerRef}>
               <div className="alert_msg">
                 <p>
-                  Created this chat on
+                  Created this chat on{" "}
                   {formatDateForInitialChatCreationAlert(
                     chats?.find((field) => field._id === groupId)?.createdAt
                   )}

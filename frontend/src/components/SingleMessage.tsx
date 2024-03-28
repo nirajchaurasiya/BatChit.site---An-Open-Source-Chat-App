@@ -37,6 +37,7 @@ import { useDropzone } from "react-dropzone";
 import InfiniteScroll from "react-infinite-scroll-component";
 import SmallSpinner from "../sub-components/SmallSpinner";
 import { editChat } from "../features/chat/chatSlice";
+import { CgMenuGridR } from "react-icons/cg";
 export default function SingleMessage({ socket }: { socket: Socket | null }) {
   const [file, setFile] = useState<File | null>(null);
   const [typingAlertText, setTypingAlertText] = useState("");
@@ -277,6 +278,7 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
           <div className="call-icons">
             <IoCall onClick={handleAudioCall} />
             <IoVideocam />
+            <CgMenuGridR />
           </div>
         </div>
 
@@ -300,7 +302,7 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
             <div ref={messageContainerRef}>
               <div className="alert_msg">
                 <p>
-                  Created this chat on
+                  Created this chat on{" "}
                   {formatDateForInitialChatCreationAlert(
                     chats?.find((field) => field._id === chatId)?.createdAt
                   )}

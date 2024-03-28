@@ -110,3 +110,15 @@ export const getGroupChats = async () => {
         return { success: false }
     }
 }
+
+export const getGroupChatWithId = async (groupId: string) => {
+    const response = await axios.get(`${chatsBackendURL}/group/get-chat/${groupId}`, Authorization);
+
+    const { success, statusCode, data } = response.data
+
+    if (success && statusCode === 200) {
+        return { success, data }
+    } else {
+        return { success: false }
+    }
+}

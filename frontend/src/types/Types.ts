@@ -40,6 +40,7 @@ interface CommonGroupDetails {
   adminUserDetails: UserDetails;
   receiverUsersDetails: UserDetails[];
   latestMessageDetails: LatestMessageDetails;
+
 }
 
 export type GroupMessageCardType = {
@@ -51,7 +52,7 @@ export type GroupChatDetails = [
     isSeen: Boolean;
     readBy: string[]
   }
-];
+]
 
 interface ChatDetails {
   _id: string;

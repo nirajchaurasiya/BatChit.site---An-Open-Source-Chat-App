@@ -2,7 +2,11 @@
   display: flex;
   width: 100%;
 }
-
+.rightbar-profile-container,
+.no-home-rightbar-profile-container {
+  height: 100vh;
+  overflow-y: scroll !important;
+}
 .user-profile-mid-container {
   display: grid;
   width: 100%;
@@ -25,4 +29,12 @@
 
 .tab-title {
   font-size: 17px;
+}
+
+.all-members {
+  padding: 10px 0;
+}
+
+.all-members:last-child {
+  border-bottom: 1px solid transparent;
 }

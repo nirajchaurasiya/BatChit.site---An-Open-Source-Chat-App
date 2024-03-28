@@ -31,11 +31,19 @@ export default function App() {
   const dispatch = useDispatch<Dispatch>();
 
   useEffect(() => {
-    setSocket(
-      io(REACT_APP_BACKEND_URL, {
-        withCredentials: true,
-      })
-    );
+    const newSocket = io(REACT_APP_BACKEND_URL, {
+      withCredentials: true,
+    });
+
+    newSocket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect();
+    };
   }, []);
 
   useEffect(() => {

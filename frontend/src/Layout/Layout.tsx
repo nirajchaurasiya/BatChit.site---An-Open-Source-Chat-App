@@ -14,7 +14,7 @@ import { getAllChatCards } from "../apis/chatActions";
 import { displayAlert } from "../utils/alertUtils";
 import { AlertMessages } from "../AlertMsg/alertMsg";
 import { AlertMessageType } from "../types/AlertTypes";
-import { saveChatCards } from "../features/chat/chatSlice";
+import { appendChat, saveChatCards } from "../features/chat/chatSlice";
 import GroupSingleMessage from "../components/GroupSingleMessage";
 
 export default function Layout({
@@ -66,6 +66,18 @@ export default function Layout({
   }, []);
 
   useEffect(() => {
+    const updateIndividualChat = (data: any) => {
+      const { specific_chat } = data;
+      dispatch(appendChat(specific_chat));
+    };
+    socket?.on("update-chat-for-individual", updateIndividualChat);
+
+    return () => {
+      socket?.off("update-chat-for-individual", updateIndividualChat);
+    };
+  }, [socket]);
+
+  useEffect(() => {
     const getChats = async () => {
       const chats = await getAllChatCards();
       if (chats.success) {
@@ -113,7 +125,7 @@ export default function Layout({
         {home && <SelectaMessage widthOfWindow={widthOfWindow} />}
         {message && <SingleMessage socket={socket} />}
         {search && searchQuery && (
-          <ViewSearchedPerson widthOfWindow={widthOfWindow} />
+          <ViewSearchedPerson socket={socket} widthOfWindow={widthOfWindow} />
         )}
         {search && widthOfWindow > 575 && !searchQuery && (
           <div

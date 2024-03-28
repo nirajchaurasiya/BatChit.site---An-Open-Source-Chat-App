@@ -5,6 +5,7 @@ import {
    deleteMessage,
    editMessage,
    getGroupChats,
+   getGroupChatWithId,
    getIndividualChat,
    getIndividualMessages,
    getSlicedMessages,
@@ -41,5 +42,7 @@ router.route("/deleteMessage/:messageId").delete(verifyJWT, deleteMessage);
 router.route("/group/create-chat").post(verifyJWT, createGroupChat);
 
 router.route("/group/get-chats").get(verifyJWT, getGroupChats);
+
+router.route("/group/get-chat/:chatId").get(verifyJWT, getGroupChatWithId);
 
 export default router;

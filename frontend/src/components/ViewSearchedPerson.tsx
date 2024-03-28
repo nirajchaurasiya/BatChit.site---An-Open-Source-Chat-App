@@ -7,17 +7,21 @@ import Top from "../sub-components/Top";
 import { getSearchedUser } from "../apis/getSearchedUser";
 import Spinner from "./Spinner";
 import { addChat } from "../apis/chatActions";
-import { useDispatch } from "react-redux";
 import { saveChatCards } from "../features/chat/chatSlice";
 import { AlertMessageType } from "../types/AlertTypes";
 import { displayAlert } from "../utils/alertUtils";
 import { AlertMessages } from "../AlertMsg/alertMsg";
 import { getAlert } from "../utils/getAlertMsgWithType";
+import { Socket } from "socket.io-client";
+import { useSelector } from "react-redux";
+import { RootState } from "../types/Rootstate";
 
 export default function ViewSearchedPerson({
   widthOfWindow,
+  socket,
 }: {
   widthOfWindow: number;
+  socket: Socket | null;
 }) {
   const [searchedObject, setSearchedObject] = useState<
     ViewSearchedPersonType | {}
@@ -29,6 +33,9 @@ export default function ViewSearchedPerson({
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const searchQuery = searchParams.get("query");
+  const loggedInUser = useSelector(
+    (state: RootState) => state.auth.loggedInUser
+  );
 
   useEffect(() => {
     const getUser = async () => {
@@ -47,23 +54,32 @@ export default function ViewSearchedPerson({
     getUser();
   }, [searchQuery]);
 
-  const dispatch = useDispatch();
   const handleAddChat = async () => {
-    const { fullName, _id } = searchedObject as ViewSearchedPersonType;
-    const response = await addChat(fullName, _id);
-    const { success, data, code, status } = response;
-    if (success) {
-      dispatch(saveChatCards(data));
-      displayAlert(setShowAlert, setCode, setMsgType, code, "chatCards", 2000);
-    } else if (status) {
-      const alertMsgCode = getAlert(status, "chatCards");
-      displayAlert(
-        setShowAlert,
-        setCode,
-        setMsgType,
-        alertMsgCode,
-        "chatCards"
-      );
+    // const { fullName, _id } = searchedObject as ViewSearchedPersonType;
+    // const response = await addChat(fullName, _id);
+    // const { success, data, code, status } = response;
+    // if (success) {
+    //   dispatch(saveChatCards(data));
+    //   displayAlert(setShowAlert, setCode, setMsgType, code, "chatCards", 2000);
+    // } else if (status) {
+    //   const alertMsgCode = getAlert(status, "chatCards");
+    //   displayAlert(
+    //     setShowAlert,
+    //     setCode,
+    //     setMsgType,
+    //     alertMsgCode,
+    //     "chatCards"
+    //   );
+    // }
+    // making-individual-chat
+    if (socket) {
+      const data = {
+        receiver: (searchedObject as ViewSearchedPersonType)._id,
+        admin: loggedInUser?._id,
+        chatName: (searchedObject as ViewSearchedPersonType).fullName,
+      };
+
+      socket.emit("making-individual-chat", data);
     }
   };
 

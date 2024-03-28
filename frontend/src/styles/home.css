@@ -69,7 +69,6 @@
   }
   .rightbar-profile-container {
     position: fixed;
-    /* background-color: blue; */
     overflow-y: scroll;
     top: 0;
     right: 0;
@@ -399,6 +398,7 @@
   color: #a39999;
   font-size: 14px;
 }
+
 .user_block_option {
   display: flex;
   flex-direction: column;

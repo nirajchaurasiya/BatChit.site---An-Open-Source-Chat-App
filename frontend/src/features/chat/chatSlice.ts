@@ -17,6 +17,9 @@ export const chatCardsSlice = createSlice({
                 (findChat as IndividualChatDetails[0]).latestMessageDetails.content = action.payload.latestMessageDetails.content;
             }
         },
+        appendChat: (state: any, action) => {
+            state.allChatCards = [...state.allChatCards, action.payload]
+        },
         // Group Chat
 
         saveGroupChatCards: (state, action) => {
@@ -28,6 +31,6 @@ export const chatCardsSlice = createSlice({
     },
 });
 
-export const { saveChatCards, editChat, saveGroupChatCards, appendGroupChat } = chatCardsSlice.actions;
+export const { saveChatCards, editChat, appendChat, saveGroupChatCards, appendGroupChat } = chatCardsSlice.actions;
 
 export default chatCardsSlice.reducer;
