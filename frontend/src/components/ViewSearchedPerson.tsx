@@ -6,12 +6,6 @@ import { ViewSearchedPersonType } from "../types/Types";
 import Top from "../sub-components/Top";
 import { getSearchedUser } from "../apis/getSearchedUser";
 import Spinner from "./Spinner";
-import { addChat } from "../apis/chatActions";
-import { saveChatCards } from "../features/chat/chatSlice";
-import { AlertMessageType } from "../types/AlertTypes";
-import { displayAlert } from "../utils/alertUtils";
-import { AlertMessages } from "../AlertMsg/alertMsg";
-import { getAlert } from "../utils/getAlertMsgWithType";
 import { Socket } from "socket.io-client";
 import { useSelector } from "react-redux";
 import { RootState } from "../types/Rootstate";
@@ -26,9 +20,6 @@ export default function ViewSearchedPerson({
   const [searchedObject, setSearchedObject] = useState<
     ViewSearchedPersonType | {}
   >({});
-  const [showAlert, setShowAlert] = useState(false);
-  const [code, setCode] = useState(3001);
-  const [msgType, setMsgType] = useState<AlertMessageType>("chatCards");
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -55,23 +46,6 @@ export default function ViewSearchedPerson({
   }, [searchQuery]);
 
   const handleAddChat = async () => {
-    // const { fullName, _id } = searchedObject as ViewSearchedPersonType;
-    // const response = await addChat(fullName, _id);
-    // const { success, data, code, status } = response;
-    // if (success) {
-    //   dispatch(saveChatCards(data));
-    //   displayAlert(setShowAlert, setCode, setMsgType, code, "chatCards", 2000);
-    // } else if (status) {
-    //   const alertMsgCode = getAlert(status, "chatCards");
-    //   displayAlert(
-    //     setShowAlert,
-    //     setCode,
-    //     setMsgType,
-    //     alertMsgCode,
-    //     "chatCards"
-    //   );
-    // }
-    // making-individual-chat
     if (socket) {
       const data = {
         receiver: (searchedObject as ViewSearchedPersonType)._id,
@@ -146,9 +120,6 @@ export default function ViewSearchedPerson({
         </>
       )}
       {loading && <Spinner />}
-      {showAlert && (
-        <AlertMessages setShowAlert={setShowAlert} code={code} type={msgType} />
-      )}
     </div>
   );
 }
