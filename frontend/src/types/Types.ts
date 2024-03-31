@@ -27,7 +27,7 @@ export interface IndividualChatDetails {
   adminUserDetails: UserDetails;
   receiverUserDetails: UserDetails;
   latestMessageDetails: LatestMessageDetails;
-  isSeen: Boolean
+  isSeen: boolean
 }
 
 interface CommonGroupDetails {
@@ -99,7 +99,7 @@ export type MessageCardType = {
     adminUserDetails: UserDetails;
     receiverUserDetails: UserDetails;
     latestMessageDetails: LatestMessageDetails;
-    seenByUsers: string[]
+    isSeen: boolean
   },
 };
 

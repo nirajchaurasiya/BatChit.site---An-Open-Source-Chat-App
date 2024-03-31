@@ -134,14 +134,16 @@ export default function Home({
     e.preventDefault();
     const userIds = addedUser?.map((e) => e._id);
 
-    const response = await createGroupChat(chatName, userIds);
+    if (userIds.length > 0) {
+      const response = await createGroupChat(chatName, userIds);
 
-    const { success, data, code } = response;
+      const { success, data, code } = response;
 
-    if (success) {
-      displayAlert(setShowAlert, setCode, setMsgType, code, "chatCards");
-      dispatch(appendGroupChat(data));
-      setAddGroupChat(false);
+      if (success) {
+        displayAlert(setShowAlert, setCode, setMsgType, code, "chatCards");
+        dispatch(appendGroupChat(data));
+        setAddGroupChat(false);
+      }
     }
   };
 
