@@ -47,6 +47,9 @@ export const seenUpdation = async (data) => {
                   { _id: messageData._id },
                   { $set: { isSeen: true } }
                );
+               await IndividualChat.findByIdAndUpdate(chatId, {
+                  $set: { isSeen: true },
+               });
                console.log("Message updated successfully:", messageData._id);
             }
          } catch (error) {

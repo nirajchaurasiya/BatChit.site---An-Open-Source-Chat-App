@@ -14,7 +14,11 @@ import { getAllChatCards } from "../apis/chatActions";
 import { displayAlert } from "../utils/alertUtils";
 import { AlertMessages } from "../AlertMsg/alertMsg";
 import { AlertMessageType } from "../types/AlertTypes";
-import { appendChat, saveChatCards } from "../features/chat/chatSlice";
+import {
+  appendChat,
+  saveChatCards,
+  updateSeenChat,
+} from "../features/chat/chatSlice";
 import GroupSingleMessage from "../components/GroupSingleMessage";
 import { updatedSeenMessages } from "../features/messages/messageSlice";
 
@@ -81,6 +85,7 @@ export default function Layout({
   useEffect(() => {
     const updateMessagesSeen = (data: any) => {
       dispatch(updatedSeenMessages(data));
+      dispatch(updateSeenChat(data));
     };
 
     socket?.on("update-seen-messages", updateMessagesSeen);
