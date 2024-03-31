@@ -138,8 +138,7 @@ export default function MyMessagePart({
             }}
           >
             <span>{messageDateFormat(message?.createdAt)}</span>
-            {message?.isSeen ||
-            message?.senderDetails?._id === message?.readBy ? (
+            {message?.isSeen ? (
               <span title="seen">
                 <IoCheckmarkDone
                   style={{

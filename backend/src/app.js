@@ -1,9 +1,11 @@
 import express from "express";
-import { addUser, removeUser } from "./user.store.js";
+import { addUser, removeUser, user } from "./user.store.js";
 import cookieParser from "cookie-parser";
 import http from "http"; // Import http module for Socket.IO
 import { Server } from "socket.io"; // Import Server class from Socket.IO
+import mongoose from "mongoose";
 const app = express();
+
 const server = http.createServer(app); // Create HTTP server using Express app
 const io = new Server(server, {
    cors: {
@@ -24,6 +26,9 @@ import chatRouter from "./routes/chat.routes.js";
 import { typingHandler } from "./socketFunctions/typingHandler.js";
 import { sendIndividualMessageHandler } from "./socketFunctions/sendIndividualMessageHandler.js";
 import { sendIndividualChatNotificationsHandler } from "./socketFunctions/sendIndividualChatNotificationsHandler.js";
+import { IndividualChatMessage } from "./models/individualChatMessage.model.js";
+import { IndividualChat } from "./models/individualChat.model.js";
+import { seenUpdation } from "./socketFunctions/seenUpdation.js";
 //routes declaration
 app.use("/api/v1/users", userRouter);
 
@@ -40,6 +45,10 @@ io.on("connection", async (socket) => {
    socket.on("send-individual-message", sendIndividualMessageHandler);
 
    socket.on("typing", typingHandler());
+
+   // update seen messages
+
+   socket.on("update-seen-message", seenUpdation);
 
    // send notifications to all user when a chat is created
 

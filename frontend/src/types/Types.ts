@@ -17,7 +17,7 @@ interface LatestMessageDetails {
   mediaType: string
 }
 
-export type IndividualChatDetails = [{
+export interface IndividualChatDetails {
   _id: string;
   chatName: string;
   isGroupChat: boolean;
@@ -28,7 +28,7 @@ export type IndividualChatDetails = [{
   receiverUserDetails: UserDetails;
   latestMessageDetails: LatestMessageDetails;
   isSeen: Boolean
-}]
+}
 
 interface CommonGroupDetails {
   _id: string;
@@ -64,13 +64,12 @@ export interface Messages {
   content: string;
   media?: string
   mediaType?: string
-  readBy: string;
   createdAt: Date;
   updatedAt: Date;
   __v: number;
   senderDetails: UserDetails;
   chatDetails: ChatDetails;
-  isSeen: Boolean
+  isSeen: Boolean;
 }
 
 export type LayoutParamsType = {
@@ -100,12 +99,13 @@ export type MessageCardType = {
     adminUserDetails: UserDetails;
     receiverUserDetails: UserDetails;
     latestMessageDetails: LatestMessageDetails;
+    seenByUsers: string[]
   },
 };
 
 export type HomeParams = LayoutParamsType & {
   children: React.ReactNode;
-  chatsCard: IndividualChatDetails | []
+  chatsCard: IndividualChatDetails[]
 };
 export type ViewSearchedPersonType = {
   _id: string;

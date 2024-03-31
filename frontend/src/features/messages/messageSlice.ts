@@ -27,10 +27,27 @@ export const messagesSlice = createSlice({
         },
         removeDeletedMessage: (state, action) => {
             state.allMessages = state.allMessages.filter((message: Messages) => message._id !== action.payload)
+        },
+
+        updatedSeenMessages: (state: any, action) => {
+            const { messagesIds, chatId } = action.payload;
+
+            // Filter messages based on chatId
+            const updatedMessages = state.allMessages.map((message: Messages) => {
+                if (message.chatDetails._id === chatId && messagesIds?.includes(message._id)) {
+                    // Update isSeen property of matchedMessages to true
+                    return { ...message, isSeen: true };
+                }
+                return message;
+            });
+
+            // Update state with the new array of messages
+            return { ...state, allMessages: updatedMessages };
         }
+
     },
 });
 
-export const { saveMessages, appendMessages, appendNextMessage, saveEditedMessage, removeDeletedMessage } = messagesSlice.actions;
+export const { saveMessages, appendMessages, appendNextMessage, saveEditedMessage, removeDeletedMessage, updatedSeenMessages } = messagesSlice.actions;
 
 export default messagesSlice.reducer;

@@ -5,7 +5,7 @@ export interface RootState {
         loggedInUser: UserType
     };
     chats: {
-        allChatCards: IndividualChatDetails,
+        allChatCards: IndividualChatDetails[],
         allGroupChatCards: GroupChatDetails
     }
     messages: {

@@ -33,7 +33,7 @@ export default function SearchComponent({
       const getUserFromSearch = await getSearchedResult(searchQuery);
       const { success, data } = getUserFromSearch;
       data?.length < 1 && !success && setInitialMsg("No user found");
-      if (data?.length > 1) {
+      if (data?.length > 0) {
         setSearchUser(data);
       }
       setLoading(false);
@@ -93,9 +93,11 @@ export default function SearchComponent({
                 <div className="card-user-desc">
                   <p>{e?.fullName}</p>
                   <p>
-                    {e?.bio?.length > 60
-                      ? `${e?.bio?.slice(0, 40)}...`
-                      : e?.bio}
+                    {e?.bio
+                      ? e?.bio?.length > 60
+                        ? `${e?.bio?.slice(0, 40)}...`
+                        : e?.bio
+                      : "Hey, I am using BatChit.site"}
                   </p>
                 </div>
               </Link>

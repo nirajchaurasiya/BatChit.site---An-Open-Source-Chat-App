@@ -16,6 +16,7 @@ import { AlertMessages } from "../AlertMsg/alertMsg";
 import { AlertMessageType } from "../types/AlertTypes";
 import { appendChat, saveChatCards } from "../features/chat/chatSlice";
 import GroupSingleMessage from "../components/GroupSingleMessage";
+import { updatedSeenMessages } from "../features/messages/messageSlice";
 
 export default function Layout({
   home,
@@ -74,6 +75,18 @@ export default function Layout({
 
     return () => {
       socket?.off("update-chat-for-individual", updateIndividualChat);
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    const updateMessagesSeen = (data: any) => {
+      dispatch(updatedSeenMessages(data));
+    };
+
+    socket?.on("update-seen-messages", updateMessagesSeen);
+
+    return () => {
+      socket?.off("update-seen-messages", updateMessagesSeen);
     };
   }, [socket]);
 

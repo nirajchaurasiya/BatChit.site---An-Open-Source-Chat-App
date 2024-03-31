@@ -142,6 +142,10 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
     }
   }, [showTyping]);
 
+  useEffect(() => {
+    socket?.emit("update-seen-message", { chatId, userId: loggedInUser?._id });
+  }, [socket, messages.length]);
+
   const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
