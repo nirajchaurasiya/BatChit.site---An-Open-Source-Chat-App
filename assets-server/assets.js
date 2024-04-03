@@ -2,10 +2,10 @@ const multer = require("multer");
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
-const PORT = 4000;
 const cors = require("cors");
 require("dotenv").config();
 
+const PORT = process.env.PORT;
 // Serve uploaded images statically
 app.use("/uploads", express.static("uploads"));
 
@@ -46,7 +46,7 @@ app.post("/api/uploadImage", upload.single("imageData"), async (req, res) => {
     if (!file) {
       return res.json({ success: false, message: "File is empty" });
     }
-    const url = `http://localhost:${PORT}/uploads/${file.filename}`;
+    const url = `${process.env.ASSETS_URL}/uploads/${file.filename}`;
     res.json({ success: true, url, mediaType: file.mimetype });
   } catch (error) {
     console.error("Error uploading image:", error);
