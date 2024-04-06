@@ -16,11 +16,16 @@ import { AlertMessages } from "../AlertMsg/alertMsg";
 import { AlertMessageType } from "../types/AlertTypes";
 import {
   appendChat,
+  editChat,
   saveChatCards,
   updateSeenChat,
 } from "../features/chat/chatSlice";
 import GroupSingleMessage from "../components/GroupSingleMessage";
-import { updatedSeenMessages } from "../features/messages/messageSlice";
+import {
+  removeDeletedMessage,
+  saveEditedMessage,
+  updatedSeenMessages,
+} from "../features/messages/messageSlice";
 
 export default function Layout({
   home,
@@ -92,6 +97,38 @@ export default function Layout({
 
     return () => {
       socket?.off("update-seen-messages", updateMessagesSeen);
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    const updateMessagesSeen = (data: any) => {
+      const { getEditedMessage, chat } = data;
+      console.log(data);
+      if (chat && getEditedMessage) {
+        dispatch(saveEditedMessage(getEditedMessage));
+        dispatch(editChat(chat));
+      }
+    };
+
+    socket?.on("edit-individual-message", updateMessagesSeen);
+
+    return () => {
+      socket?.off("edit-individual-message", updateMessagesSeen);
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    const updateMessagesSeen = (data: any) => {
+      const { messageId } = data;
+      if (messageId) {
+        dispatch(removeDeletedMessage(messageId));
+      }
+    };
+
+    socket?.on("delete-individual-message", updateMessagesSeen);
+
+    return () => {
+      socket?.off("delete-individual-message", updateMessagesSeen);
     };
   }, [socket]);
 

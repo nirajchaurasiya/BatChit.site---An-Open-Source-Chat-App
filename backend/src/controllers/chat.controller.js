@@ -5,6 +5,8 @@ import { IndividualChat } from "../models/individualChat.model.js";
 import mongoose from "mongoose";
 import { IndividualChatMessage } from "../models/individualChatMessage.model.js";
 import { GroupChat } from "../models/groupChat.model.js";
+import { io } from "../app.js";
+import { user } from "../user.store.js";
 
 const createIndividualChat = asyncHandler(async (req, res) => {
    try {
@@ -538,7 +540,7 @@ const editMessage = asyncHandler(async (req, res) => {
 
       const message = await IndividualChatMessage?.findByIdAndUpdate(
          messageId,
-         { $set: { content: content } },
+         { $set: { content: content, isEdited: true } },
          {
             new: true,
          }
@@ -718,16 +720,39 @@ const editMessage = asyncHandler(async (req, res) => {
          },
       ]);
 
+      const chat = await IndividualChat.findById(message.chat);
+
+      if (!chat) {
+         throw new ApiError(405, `We couldn't find the chat`);
+      }
+      console.log(chat.admin, chat.receiver);
+      const senderUserSocketId = user.find(
+         (field) => field?.userId === chat.admin.toString()
+      )?.socketId;
+      const receiverUserSocketId = user.find(
+         (field) => field?.userId === chat.receiver.toString()
+      )?.socketId;
+      console.log(`type of sockets`, senderUserSocketId, receiverUserSocketId);
+
+      if (senderUserSocketId) {
+         io.to(senderUserSocketId).emit("edit-individual-message", {
+            chat: chats[0],
+            getEditedMessage: getEditedMessage[0],
+         });
+
+         console.log(`sent1`);
+      }
+      if (receiverUserSocketId) {
+         io.to(receiverUserSocketId).emit("edit-individual-message", {
+            chat: chats[0],
+            getEditedMessage: getEditedMessage[0],
+         });
+         console.log(`sent2`);
+      }
+
       return res
          .status(200)
-         .json(
-            new ApiResponse(
-               200,
-               { chat: chats[0], getEditedMessage: getEditedMessage[0] },
-               "Message edited success",
-               10001
-            )
-         );
+         .json(new ApiResponse(200, [], "Message edited success", 10001));
    } catch (error) {
       throw new ApiError(500, error?.message || "Something went wrong");
    }
@@ -749,7 +774,18 @@ const deleteMessage = asyncHandler(async (req, res) => {
          throw new ApiError(404, "Message doesn't exists");
       }
 
-      await IndividualChatMessage.findByIdAndDelete(messageId);
+      await IndividualChatMessage.findByIdAndUpdate(
+         messageId,
+         {
+            $set: {
+               media: "",
+               mediaType: "",
+               content: "Deleted by sender",
+               isDeleted: true,
+            },
+         },
+         { $new: true }
+      );
 
       // To update the latest message details
 
@@ -760,141 +796,39 @@ const deleteMessage = asyncHandler(async (req, res) => {
       if (!chat) {
          throw new ApiError(400, "chat doesn't exists");
       }
-      const latestMessage = await IndividualChatMessage.findOne({
-         chat: chat?._id,
-      })
-         .sort({ createdAt: -1 })
-         .exec();
 
-      chat.latestMessage = latestMessage?._id;
+      const senderUserSocketId = user.find(
+         (field) => field?.userId === chat.admin.toString()
+      )?.socketId;
+      const receiverUserSocketId = user.find(
+         (field) => field?.userId === chat.receiver.toString()
+      )?.socketId;
+      console.log(`type of sockets`, senderUserSocketId, receiverUserSocketId);
 
-      await chat?.save();
+      if (senderUserSocketId) {
+         io.to(senderUserSocketId).emit("delete-individual-message", {
+            messageId: messageId,
+         });
 
-      const chats = await IndividualChat.aggregate([
-         {
-            $match: {
-               _id: chat?._id,
-            },
-         },
-         {
-            $lookup: {
-               from: "users",
-               localField: "admin",
-               foreignField: "_id",
-               as: "adminUserDetails",
-               pipeline: [
-                  {
-                     $project: {
-                        _id: 1,
-                        fullName: 1,
-                        background: 1,
-                        email: 1,
-                        bio: 1,
-                     },
-                  },
-               ],
-            },
-         },
-         {
-            $addFields: {
-               adminUserDetails: {
-                  $arrayElemAt: ["$adminUserDetails", 0],
-               },
-            },
-         },
-         {
-            $lookup: {
-               from: "users",
-               localField: "receiver",
-               foreignField: "_id",
-               as: "receiverUserDetails",
-               pipeline: [
-                  {
-                     $project: {
-                        _id: 1,
-                        fullName: 1,
-                        background: 1,
-                        email: 1,
-                        bio: 1,
-                     },
-                  },
-               ],
-            },
-         },
-         {
-            $addFields: {
-               receiverUserDetails: {
-                  $arrayElemAt: ["$receiverUserDetails", 0],
-               },
-            },
-         },
-         {
-            $lookup: {
-               from: "individualchatmessages",
-               foreignField: "_id",
-               localField: "latestMessage",
-               as: "latestMessageDetails",
-               pipeline: [
-                  {
-                     $project: {
-                        _id: 1,
-                        sender: 1,
-                        content: 1,
-                        media: 1,
-                        mediaType: 1,
-                     },
-                  },
-               ],
-            },
-         },
-         {
-            $addFields: {
-               latestMessageDetails: {
-                  $arrayElemAt: ["$latestMessageDetails", 0],
-               },
-            },
-         },
-         {
-            $lookup: {
-               from: "users",
-               localField: "latestMessageDetails.sender",
-               foreignField: "_id",
-               as: "latestMessageDetails.senderDetails",
-               pipeline: [
-                  {
-                     $project: {
-                        _id: 1,
-                        fullName: 1,
-                        background: 1,
-                        email: 1,
-                        bio: 1,
-                     },
-                  },
-               ],
-            },
-         },
-         {
-            $addFields: {
-               "latestMessageDetails.senderDetails": {
-                  $arrayElemAt: ["$latestMessageDetails.senderDetails", 0],
-               },
-            },
-         },
-         {
-            $unset: ["admin", "receiver", "latestMessage"],
-         },
-      ]);
+         console.log(`sent1`);
+      }
+      if (receiverUserSocketId) {
+         io.to(receiverUserSocketId).emit("delete-individual-message", {
+            messageId: messageId,
+         });
+         console.log(`sent2`);
+      }
 
-      return res
-         .status(200)
-         .json(
-            new ApiResponse(
-               200,
-               { chat: chats[0] },
-               "Message deleted successfully",
-               10002
-            )
-         );
+      // return res
+      //    .status(200)
+      //    .json(
+      //       new ApiResponse(
+      //          200,
+      //          { chat: chats[0] },
+      //          "Message deleted successfully",
+      //          10002
+      //       )
+      //    );
    } catch (error) {
       throw new ApiError(500, error?.message || "Something went wrong");
    }

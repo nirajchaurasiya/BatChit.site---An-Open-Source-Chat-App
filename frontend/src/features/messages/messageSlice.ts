@@ -23,10 +23,15 @@ export const messagesSlice = createSlice({
             const messageToUpdate = state.allMessages.find(field => (field as Messages)._id === action.payload._id);
             if (messageToUpdate) {
                 (messageToUpdate as Messages).content = action.payload.content;
+                (messageToUpdate as Messages).isEdited = true;
             }
         },
         removeDeletedMessage: (state, action) => {
-            state.allMessages = state.allMessages.filter((message: Messages) => message._id !== action.payload)
+            const message = state.allMessages.find((message: Messages) => message._id === action.payload)
+            if (message) {
+                (message as Messages).content = 'Deleted by sender';
+                (message as Messages).isDeleted = true
+            }
         },
 
         updatedSeenMessages: (state: any, action) => {

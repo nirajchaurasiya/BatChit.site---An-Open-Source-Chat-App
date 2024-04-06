@@ -70,6 +70,8 @@ export interface Messages {
   senderDetails: UserDetails;
   chatDetails: ChatDetails;
   isSeen: Boolean;
+  isDeleted: Boolean;
+  isEdited: Boolean;
 }
 
 export type LayoutParamsType = {

@@ -26,8 +26,6 @@ import chatRouter from "./routes/chat.routes.js";
 import { typingHandler } from "./socketFunctions/typingHandler.js";
 import { sendIndividualMessageHandler } from "./socketFunctions/sendIndividualMessageHandler.js";
 import { sendIndividualChatNotificationsHandler } from "./socketFunctions/sendIndividualChatNotificationsHandler.js";
-import { IndividualChatMessage } from "./models/individualChatMessage.model.js";
-import { IndividualChat } from "./models/individualChat.model.js";
 import { seenUpdation } from "./socketFunctions/seenUpdation.js";
 //routes declaration
 app.use("/api/v1/users", userRouter);
@@ -53,6 +51,8 @@ io.on("connection", async (socket) => {
    // send notifications to all user when a chat is created
 
    socket.on("making-individual-chat", sendIndividualChatNotificationsHandler);
+
+   // Individual Video Chat
 
    socket.on("disconnect", () => {
       console.log("User disconnected");

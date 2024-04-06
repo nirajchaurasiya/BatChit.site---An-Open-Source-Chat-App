@@ -29,7 +29,6 @@ import {
 import {
   appendMessages,
   removeDeletedMessage,
-  saveEditedMessage,
   saveMessages,
 } from "../features/messages/messageSlice";
 import { sendFileToServer } from "../utils/sendFileToServer";
@@ -234,10 +233,10 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
   const editMessageAction = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const response = await editMessage(messageIdToEdit, messageValue);
-    const { success, chat, getEditedMessage } = response;
+    const { success } = response;
     if (success) {
-      dispatch(saveEditedMessage(getEditedMessage));
-      dispatch(editChat(chat));
+      // dispatch(saveEditedMessage(getEditedMessage));
+      // dispatch(editChat(chat));
     }
     setMessageIdToEdit("");
     setMessageValue("");

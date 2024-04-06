@@ -53,14 +53,14 @@ export default function MyMessagePart({
               <div className="media-message">
                 <p className="message-value-with-media">{message?.content}</p>
                 <div className="message-bottom-border"></div>
-                {message?.media && (
+                {!message.isDeleted && message?.media && (
                   <div
                     className="message-media"
                     style={{
                       cursor: "pointer",
                     }}
                   >
-                    {message?.mediaType?.split("/")?.includes("image") ? (
+                    {message?.mediaType?.split("/")?.includes("image") && (
                       <div
                         onClick={() => {
                           setMedia(message?.media);
@@ -68,49 +68,68 @@ export default function MyMessagePart({
                       >
                         <img src={message?.media} alt="media" />
                       </div>
-                    ) : (
+                    )}
+                    {message?.mediaType?.split("/")?.includes("video") && (
                       <video src={message?.media} controls />
+                    )}
+                    {message?.mediaType?.split("/")?.includes("audio") && (
+                      <audio src={message?.media} controls />
+                    )}
+                    {!message.isDeleted && (
+                      <div className="dropdown">
+                        <button className="dropbtn">
+                          <p>
+                            <IoIosArrowDown />
+                          </p>
+                        </button>
+
+                        <div className="dropdown-content">
+                          {message?.createdAt ? (
+                            new Date().getTime() -
+                              new Date(message.createdAt).getTime() >
+                            3600000 ? (
+                              <p
+                                onClick={async () => {
+                                  await navigator.clipboard.writeText(
+                                    message?.content
+                                  );
+                                }}
+                              >
+                                Copy
+                              </p>
+                            ) : (
+                              <>
+                                <p
+                                  onClick={() =>
+                                    handleMessageDeletion(message?._id)
+                                  }
+                                >
+                                  Delete
+                                </p>
+                              </>
+                            )
+                          ) : null}
+                        </div>
+                      </div>
                     )}
                   </div>
                 )}
               </div>
             ) : (
               <>
-                <div className="dropdown">
-                  <button className="dropbtn">
-                    <p>
-                      <IoIosArrowDown />
-                    </p>
-                  </button>
+                {!message.isDeleted && (
+                  <div className="dropdown">
+                    <button className="dropbtn">
+                      <p>
+                        <IoIosArrowDown />
+                      </p>
+                    </button>
 
-                  <div className="dropdown-content">
-                    {message?.createdAt ? (
-                      new Date().getTime() -
-                        new Date(message.createdAt).getTime() >
-                      3600000 ? (
-                        <p
-                          onClick={async () => {
-                            await navigator.clipboard.writeText(
-                              message?.content
-                            );
-                          }}
-                        >
-                          Copy
-                        </p>
-                      ) : (
-                        <>
-                          <p
-                            onClick={() => {
-                              handleClickMessage(message?._id);
-                            }}
-                          >
-                            Edit
-                          </p>
-                          <p
-                            onClick={() => handleMessageDeletion(message?._id)}
-                          >
-                            Delete
-                          </p>
+                    <div className="dropdown-content">
+                      {message?.createdAt ? (
+                        new Date().getTime() -
+                          new Date(message.createdAt).getTime() >
+                        3600000 ? (
                           <p
                             onClick={async () => {
                               await navigator.clipboard.writeText(
@@ -120,12 +139,50 @@ export default function MyMessagePart({
                           >
                             Copy
                           </p>
-                        </>
-                      )
-                    ) : null}
+                        ) : (
+                          <>
+                            <p
+                              onClick={() => {
+                                handleClickMessage(message?._id);
+                              }}
+                            >
+                              Edit
+                            </p>
+                            <p
+                              onClick={() =>
+                                handleMessageDeletion(message?._id)
+                              }
+                            >
+                              Delete
+                            </p>
+                            <p
+                              onClick={async () => {
+                                await navigator.clipboard.writeText(
+                                  message?.content
+                                );
+                              }}
+                            >
+                              Copy
+                            </p>
+                          </>
+                        )
+                      ) : null}
+                    </div>
                   </div>
-                </div>
-                <p className="message-value">{message?.content}</p>
+                )}
+                <p
+                  className="message-value"
+                  style={
+                    message.isDeleted
+                      ? {
+                          background: "transparent",
+                          border: "1px solid #333232",
+                        }
+                      : {}
+                  }
+                >
+                  {message.isDeleted ? "Deleted by you" : message?.content}
+                </p>
               </>
             )}
           </div>
@@ -139,15 +196,22 @@ export default function MyMessagePart({
           >
             <span>{messageDateFormat(message?.createdAt)}</span>
             {message?.isSeen ? (
-              <span title="seen">
-                <IoCheckmarkDone
-                  style={{
-                    marginLeft: "5px",
-                    color: "lightgreen",
-                    fontSize: "15px",
-                  }}
-                />
-              </span>
+              <>
+                {!message.isDeleted && message.isEdited && (
+                  <span style={{ fontSize: "9px", marginLeft: "2px" }}>
+                    (Edited)
+                  </span>
+                )}
+                <span title="seen">
+                  <IoCheckmarkDone
+                    style={{
+                      marginLeft: "5px",
+                      color: "lightgreen",
+                      fontSize: "15px",
+                    }}
+                  />
+                </span>
+              </>
             ) : (
               <span
                 style={{ marginLeft: "5px", fontSize: "15px" }}

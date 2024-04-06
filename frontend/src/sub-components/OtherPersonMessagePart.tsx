@@ -42,7 +42,7 @@ export default function OtherPersonMessagePart({
       <div className="user_conversation_container">
         <div className="user_msg_container">
           <div className="other_user_messages">
-            {message?.media ? (
+            {!message.isDeleted && message?.media ? (
               <div
                 className="media-message"
                 style={{ background: "#262626", borderTopLeftRadius: "20px" }}
@@ -59,35 +59,45 @@ export default function OtherPersonMessagePart({
                     }}
                     className="message-media"
                   >
-                    {message?.mediaType?.split("/")?.includes("image") ? (
-                      <img
-                        style={{
-                          background: "#262626",
-                          cursor: "pointer",
+                    {message?.mediaType?.split("/")?.includes("image") && (
+                      <div
+                        onClick={() => {
+                          setMedia(message?.media);
                         }}
-                        src={message?.media}
-                        alt="media"
-                      />
-                    ) : (
-                      <video
-                        style={{
-                          background: "#262626",
-                        }}
-                        src={message?.media}
-                        controls
-                      />
+                      >
+                        <img src={message?.media} alt="media" />
+                      </div>
+                    )}
+                    {message?.mediaType?.split("/")?.includes("video") && (
+                      <video src={message?.media} controls />
+                    )}
+                    {message?.mediaType?.split("/")?.includes("audio") && (
+                      <audio src={message?.media} controls></audio>
                     )}
                   </div>
                 )}
               </div>
             ) : (
-              <p className="message-value" style={{ maxWidth: "65%" }}>
+              <p
+                className="message-value"
+                style={
+                  message.isDeleted
+                    ? {
+                        background: "transparent",
+                        border: "1px solid #333232",
+                      }
+                    : { maxWidth: "65%" }
+                }
+              >
                 {message?.content}
               </p>
             )}
           </div>
 
           <span>{messageDateFormat(message?.createdAt)}</span>
+          {!message.isDeleted && message.isEdited && (
+            <span style={{ fontSize: "9px", marginLeft: "2px" }}>(Edited)</span>
+          )}
         </div>
       </div>
       {media && (
