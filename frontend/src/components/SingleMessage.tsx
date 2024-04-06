@@ -37,6 +37,8 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import SmallSpinner from "../sub-components/SmallSpinner";
 import { editChat } from "../features/chat/chatSlice";
 import { CgMenuGridR } from "react-icons/cg";
+import { GoDotFill } from "react-icons/go";
+import { customTimeFormat } from "../utils/timeFormatter";
 export default function SingleMessage({ socket }: { socket: Socket | null }) {
   const [file, setFile] = useState<File | null>(null);
   const [typingAlertText, setTypingAlertText] = useState("");
@@ -254,6 +256,7 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
     }
   };
 
+  const chat = chats?.find((field) => field._id === chatId);
   return loader ? (
     <Spinner />
   ) : (
@@ -267,15 +270,54 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
               onClick={() => setShowProfile(!showProfile)}
             >
               <p>
-                {chats?.find((field) => field._id === chatId)?.adminUserDetails
-                  ?._id === loggedInUser?._id
-                  ? chats?.find((field) => field._id === chatId)
-                      ?.receiverUserDetails?.fullName
-                  : chats?.find((field) => field._id === chatId)
-                      ?.adminUserDetails?.fullName}
+                {chat?.adminUserDetails?._id === loggedInUser?._id
+                  ? chat?.receiverUserDetails?.fullName
+                  : chat?.adminUserDetails?.fullName}
               </p>
 
-              <p>Active: 1 hr ago</p>
+              {chat?.adminUserDetails?._id === loggedInUser._id ? (
+                chat?.receiverUserDetails?.isOnline ? (
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <GoDotFill
+                      style={{
+                        padding: "0px",
+                        height: "12px",
+                        width: "12px",
+                        marginRight: "5px",
+                        color: "lightgreen",
+                        marginBottom: "-3px",
+                      }}
+                      title="active"
+                    />
+                    <p>Active now</p>
+                  </div>
+                ) : (
+                  <p>
+                    Active:
+                    {customTimeFormat(chat?.receiverUserDetails?.lastSeen)}
+                  </p>
+                )
+              ) : chat?.adminUserDetails?.isOnline ? (
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <GoDotFill
+                    style={{
+                      padding: "0px",
+                      height: "12px",
+                      width: "12px",
+                      marginRight: "5px",
+                      color: "lightgreen",
+                      marginBottom: "-3px",
+                    }}
+                    title="active"
+                  />
+                  <p>Active now</p>
+                </div>
+              ) : (
+                <p>
+                  Active:
+                  {customTimeFormat(chat?.receiverUserDetails?.lastSeen)}
+                </p>
+              )}
             </div>
           </div>
           <div className="call-icons">
@@ -306,9 +348,7 @@ export default function SingleMessage({ socket }: { socket: Socket | null }) {
               <div className="alert_msg">
                 <p>
                   Created this chat on{" "}
-                  {formatDateForInitialChatCreationAlert(
-                    chats?.find((field) => field._id === chatId)?.createdAt
-                  )}
+                  {formatDateForInitialChatCreationAlert(chat?.createdAt)}
                 </p>
               </div>
               {/* Message Container */}

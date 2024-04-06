@@ -53,7 +53,12 @@ export default function MessageCard({ data }: MessageCardType) {
                         )[0]
                   }:  ${
                     data?.latestMessageDetails?.content
-                      ? data?.latestMessageDetails?.content?.length > 25
+                      ? data?.latestMessageDetails.isDeleted
+                        ? data.latestMessageDetails.senderDetails._id.toString() ===
+                          loggedInUser._id.toString()
+                          ? "You deleted this message"
+                          : "This message was deleted"
+                        : data?.latestMessageDetails?.content?.length > 25
                         ? data?.latestMessageDetails?.content?.slice(0, 30) +
                           "..."
                         : data?.latestMessageDetails?.content?.slice(0, 25)

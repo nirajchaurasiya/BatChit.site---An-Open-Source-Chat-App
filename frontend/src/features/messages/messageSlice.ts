@@ -29,7 +29,7 @@ export const messagesSlice = createSlice({
         removeDeletedMessage: (state, action) => {
             const message = state.allMessages.find((message: Messages) => message._id === action.payload)
             if (message) {
-                (message as Messages).content = 'Deleted by sender';
+                (message as Messages).content = 'This message was deleted';
                 (message as Messages).isDeleted = true
             }
         },

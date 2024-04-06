@@ -26,6 +26,7 @@ import {
   saveEditedMessage,
   updatedSeenMessages,
 } from "../features/messages/messageSlice";
+import { storeOnlineUsers } from "../features/online-users/onlineUsers";
 
 export default function Layout({
   home,
@@ -114,6 +115,26 @@ export default function Layout({
 
     return () => {
       socket?.off("edit-individual-message", updateMessagesSeen);
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (loggedInUser._id) {
+      socket?.emit("get-online-users", loggedInUser._id);
+    }
+  }, [socket, loggedInUser?._id]);
+
+  useEffect(() => {
+    const updateOnlineUsers = (data: any) => {
+      if (data?.length > 0) {
+        dispatch(storeOnlineUsers(data));
+      }
+    };
+
+    socket?.on("update-online-users", updateOnlineUsers);
+
+    return () => {
+      socket?.off("update-online-users", updateOnlineUsers);
     };
   }, [socket]);
 

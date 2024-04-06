@@ -1,4 +1,4 @@
-import { GroupChatDetails, IndividualChatDetails, Messages } from "./Types";
+import { GroupChatDetails, IndividualChatDetails, Messages, OnlineUserType } from "./Types";
 
 export interface RootState {
     auth: {
@@ -10,7 +10,12 @@ export interface RootState {
     }
     messages: {
         allMessages: Messages[]
+    };
+
+    onlineUsers: {
+        onlineUsers: OnlineUserType[]
     }
+
 }
 
 export interface UserType {

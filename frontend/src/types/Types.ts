@@ -5,16 +5,18 @@ interface UserDetails {
   fullName: string;
   bio?: string; // Optional property
   background: string;
-  email: string
+  email: string;
+  isOnline?: Boolean;
+  lastSeen?: Date;
 }
-
 
 interface LatestMessageDetails {
   _id: string;
   content: string;
   senderDetails: UserDetails;
   media: string;
-  mediaType: string
+  mediaType: string;
+  isDeleted: boolean
 }
 
 export interface IndividualChatDetails {
@@ -101,7 +103,7 @@ export type MessageCardType = {
     adminUserDetails: UserDetails;
     receiverUserDetails: UserDetails;
     latestMessageDetails: LatestMessageDetails;
-    isSeen: boolean
+    isSeen: boolean;
   },
 };
 
@@ -147,3 +149,8 @@ export type GroupedUserType = {
 };
 // authActionTypes.ts
 
+// Online User Types
+
+export interface OnlineUserType {
+  _id: string;
+}
