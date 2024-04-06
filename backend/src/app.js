@@ -78,7 +78,6 @@ io.on("connection", async (socket) => {
       if (socketId) {
          io.to(socketId).emit("add-an-online-user", user);
       }
-      cd;
    });
 
    socket.on("get-online-users", (userId) => {
