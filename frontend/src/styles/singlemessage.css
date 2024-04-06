@@ -316,7 +316,6 @@
   background-color: #292929;
   border-bottom-right-radius: 20px;
   margin-bottom: 10px;
-  width: min-content;
 }
 .my_messages .message-value-with-media {
   border-top-left-radius: 10px;

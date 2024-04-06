@@ -3,7 +3,8 @@ export const sendFileToServer = async (file?: File, progressCallback?: (progress
         if (file) {
             const fd = new FormData()
             fd.append('imageData', file)
-
+            fd.append('fileType', file.type);
+            console.log(file);
             return new Promise<{ success: boolean, url?: string, mediaType?: string }>((resolve, _) => {
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', `${import.meta.env.VITE_REACT_APP_ASSETS_SERVER}`);

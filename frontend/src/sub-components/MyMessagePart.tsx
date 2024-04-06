@@ -69,12 +69,48 @@ export default function MyMessagePart({
                         <img src={message?.media} alt="media" />
                       </div>
                     )}
-                    {message?.mediaType?.split("/")?.includes("video") && (
+
+                    {(message?.mediaType?.split("/")?.includes("video") ||
+                      message?.mediaType
+                        ?.split("/")
+                        .includes("octet-stream")) && (
                       <video src={message?.media} controls />
                     )}
+
                     {message?.mediaType?.split("/")?.includes("audio") && (
                       <audio src={message?.media} controls />
                     )}
+
+                    {message?.mediaType?.split("/")?.includes("pdf") && (
+                      <object
+                        data={message?.media}
+                        type="application/pdf"
+                        width="100%"
+                      />
+                    )}
+
+                    {message?.mediaType?.split("/")?.includes("ms-excel") && (
+                      <iframe src={message?.media} width="100%" />
+                    )}
+
+                    {message?.mediaType?.split("/")?.includes("msword") && (
+                      <iframe src={message?.media} width="100%" />
+                    )}
+
+                    {message?.mediaType
+                      ?.split("/")
+                      ?.includes("ms-powerpoint") && (
+                      <iframe src={message?.media} width="100%" />
+                    )}
+
+                    {message?.mediaType?.split("/")?.includes("plain") && (
+                      <iframe src={message?.media} width="100%" />
+                    )}
+
+                    {message?.mediaType?.split("/")?.includes("zip") && (
+                      <iframe src={message?.media} width="100%" />
+                    )}
+
                     {!message.isDeleted && (
                       <div className="dropdown">
                         <button className="dropbtn">
@@ -89,13 +125,11 @@ export default function MyMessagePart({
                               new Date(message.createdAt).getTime() >
                             3600000 ? (
                               <p
-                                onClick={async () => {
-                                  await navigator.clipboard.writeText(
-                                    message?.content
-                                  );
-                                }}
+                                onClick={() =>
+                                  window.open(message.media, "_active")
+                                }
                               >
-                                Copy
+                                Download
                               </p>
                             ) : (
                               <>
@@ -105,6 +139,13 @@ export default function MyMessagePart({
                                   }
                                 >
                                   Delete
+                                </p>
+                                <p
+                                  onClick={() =>
+                                    window.open(message.media, "_active")
+                                  }
+                                >
+                                  Download
                                 </p>
                               </>
                             )

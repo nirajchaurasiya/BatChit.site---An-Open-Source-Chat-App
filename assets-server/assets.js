@@ -42,8 +42,12 @@ app.get("/api/check", (req, res) => {
 app.post("/api/uploadImage", upload.single("imageData"), async (req, res) => {
   try {
     const file = req.file;
-
+    const { fileType } = req.body;
     if (!file) {
+      return res.json({ success: false, message: "File is empty" });
+    }
+    file.mimetype = fileType;
+    if (!fileType) {
       return res.json({ success: false, message: "File is empty" });
     }
     const url = `${process.env.ASSETS_URL}/uploads/${file.filename}`;
