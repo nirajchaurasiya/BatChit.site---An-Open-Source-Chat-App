@@ -119,7 +119,7 @@ export default function Layout({
   }, [socket]);
 
   useEffect(() => {
-    if (loggedInUser._id) {
+    if (loggedInUser && loggedInUser?._id) {
       socket?.emit("get-online-users", loggedInUser._id);
     }
   }, [socket, loggedInUser?._id]);

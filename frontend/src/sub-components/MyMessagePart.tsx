@@ -70,10 +70,7 @@ export default function MyMessagePart({
                       </div>
                     )}
 
-                    {(message?.mediaType?.split("/")?.includes("video") ||
-                      message?.mediaType
-                        ?.split("/")
-                        .includes("octet-stream")) && (
+                    {message?.mediaType?.split("/")?.includes("video") && (
                       <video src={message?.media} controls />
                     )}
 
@@ -107,8 +104,39 @@ export default function MyMessagePart({
                       <iframe src={message?.media} width="100%" />
                     )}
 
+                    {message?.mediaType?.split("/")?.includes("json") && (
+                      <p
+                        style={{
+                          fontSize: "11px",
+                          padding: "0 6px",
+                        }}
+                      >
+                        <span>{message.mediaType}</span>
+                        <br />
+                        {message.media.split("/").pop()}
+                      </p>
+                    )}
+                    {message?.mediaType?.split("/")?.includes("text") && (
+                      <p
+                        style={{
+                          fontSize: "11px",
+                          padding: "0 6px",
+                        }}
+                      >
+                        <span>{message.mediaType}</span>
+                        <br />
+                        {message.media.split("/").pop()}
+                      </p>
+                    )}
+
                     {message?.mediaType?.split("/")?.includes("zip") && (
                       <iframe src={message?.media} width="100%" />
+                    )}
+
+                    {message.mediaType?.split("/").includes("octet-stream") && (
+                      <p style={{ fontSize: "11px", padding: "0 5px" }}>
+                        {message.media.split("/").pop()}
+                      </p>
                     )}
 
                     {!message.isDeleted && (

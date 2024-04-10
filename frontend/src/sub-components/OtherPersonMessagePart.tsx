@@ -47,15 +47,14 @@ export default function OtherPersonMessagePart({
                 className="media-message"
                 style={{ background: "#262626", borderTopLeftRadius: "20px" }}
               >
-                <p className="message-value-with-media">{message?.content}</p>
+                {message.content && (
+                  <p className="message-value-with-media">{message?.content}</p>
+                )}
                 <div className="message-bottom-border"></div>
                 {message?.media && (
                   <div
                     style={{
                       cursor: "pointer",
-                    }}
-                    onClick={() => {
-                      setMedia(message?.media);
                     }}
                     className="message-media"
                   >
@@ -68,11 +67,170 @@ export default function OtherPersonMessagePart({
                         <img src={message?.media} alt="media" />
                       </div>
                     )}
+
                     {message?.mediaType?.split("/")?.includes("video") && (
-                      <video src={message?.media} controls />
+                      <div>
+                        <video src={message?.media} controls />
+                      </div>
                     )}
+
                     {message?.mediaType?.split("/")?.includes("audio") && (
-                      <audio src={message?.media} controls></audio>
+                      <audio src={message?.media} controls />
+                    )}
+
+                    {message?.mediaType?.split("/")?.includes("pdf") && (
+                      <object
+                        data={message?.media}
+                        type="application/pdf"
+                        width="100%"
+                      />
+                    )}
+
+                    {message?.mediaType?.split("/")?.includes("ms-excel") && (
+                      <div
+                        style={{ padding: "10px" }}
+                        onClick={() => {
+                          window.open(message.media, "_active");
+                        }}
+                      >
+                        <p
+                          style={{
+                            fontSize: "11px",
+                            padding: "0 6px",
+                          }}
+                        >
+                          <span>{message.mediaType}</span>
+                          <br />
+                          {message.media.split("/").pop()}
+                        </p>
+                      </div>
+                    )}
+
+                    {message?.mediaType?.split("/")?.includes("msword") && (
+                      <div
+                        style={{ padding: "10px" }}
+                        onClick={() => {
+                          window.open(message.media, "_active");
+                        }}
+                      >
+                        <p
+                          style={{
+                            fontSize: "11px",
+                            padding: "0 6px",
+                          }}
+                        >
+                          <span>{message.mediaType}</span>
+                          <br />
+                          {message.media.split("/").pop()}
+                        </p>
+                      </div>
+                    )}
+
+                    {message?.mediaType
+                      ?.split("/")
+                      ?.includes("ms-powerpoint") && (
+                      <div
+                        style={{ padding: "10px" }}
+                        onClick={() => {
+                          window.open(message.media, "_active");
+                        }}
+                      >
+                        <p
+                          style={{
+                            fontSize: "11px",
+                            padding: "0 6px",
+                          }}
+                        >
+                          <span>{message.mediaType}</span>
+                          <br />
+                          {message.media.split("/").pop()}
+                        </p>
+                      </div>
+                    )}
+
+                    {message?.mediaType?.split("/")?.includes("plain") && (
+                      <div
+                        style={{ padding: "10px" }}
+                        onClick={() => {
+                          window.open(message.media, "_active");
+                        }}
+                      >
+                        <p
+                          style={{
+                            fontSize: "11px",
+                            padding: "0 6px",
+                          }}
+                        >
+                          <span>{message.mediaType}</span>
+                          <br />
+                          {message.media.split("/").pop()}
+                        </p>
+                      </div>
+                    )}
+
+                    {message?.mediaType?.split("/")?.includes("json") && (
+                      <div
+                        style={{ padding: "10px" }}
+                        onClick={() => {
+                          window.open(message.media, "_active");
+                        }}
+                      >
+                        <p
+                          style={{
+                            fontSize: "11px",
+                            padding: "0 6px",
+                          }}
+                        >
+                          <span>{message.mediaType}</span>
+                          <br />
+                          {message.media.split("/").pop()}
+                        </p>
+                      </div>
+                    )}
+                    {message?.mediaType?.split("/")?.includes("text") && (
+                      <div
+                        style={{ padding: "10px" }}
+                        onClick={() => {
+                          window.open(message.media, "_active");
+                        }}
+                      >
+                        <p
+                          style={{
+                            fontSize: "11px",
+                            padding: "0 6px",
+                          }}
+                        >
+                          <span>{message.mediaType}</span>
+                          <br />
+                          {message.media.split("/").pop()}
+                        </p>
+                      </div>
+                    )}
+
+                    {message?.mediaType?.split("/")?.includes("zip") && (
+                      <div
+                        style={{ padding: "10px" }}
+                        onClick={() => {
+                          window.open(message.media, "_active");
+                        }}
+                      >
+                        <p
+                          style={{
+                            fontSize: "11px",
+                            padding: "0 6px",
+                          }}
+                        >
+                          <span>{message.mediaType}</span>
+                          <br />
+                          {message.media.split("/").pop()}
+                        </p>
+                      </div>
+                    )}
+
+                    {message.mediaType?.split("/").includes("octet-stream") && (
+                      <p style={{ fontSize: "11px", padding: "0 5px" }}>
+                        {message.media.split("/").pop()}
+                      </p>
                     )}
                   </div>
                 )}

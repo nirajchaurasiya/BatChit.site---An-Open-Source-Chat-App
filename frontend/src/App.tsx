@@ -47,7 +47,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (loggedInUser?._id) {
+    if (loggedInUser && loggedInUser?._id) {
       socket?.emit("add-user", loggedInUser._id);
     }
   }, [socket, loggedInUser?._id]);
